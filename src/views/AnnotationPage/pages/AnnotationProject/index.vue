@@ -16,17 +16,20 @@
     <!-- 项目主体 -->
     <div class="project-content">
       <!-- 项目主体卡片 -->
-      <div class="project-item" v-for="i in 6">
+      <div class="project-item" v-for="item in projectStore.annotationProject">
         <!-- 上部 -->
         <div class="top-content">
-
+          {{item.name}}
         </div>
         <!-- 下部 -->
         <div class="buttom-content">
-          111
+          {{item.description}}
+          <br>
+          {{item.date}}
         </div>
       </div>
     </div>
+    <el-empty description="暂无项目,请点击右上角创建项目" v-if="projectStore.annotationProject.length===0"/>
     <!-- 创建项目的遮罩层 -->
     <CreateProject></CreateProject>
   </main>
@@ -36,16 +39,23 @@
 <script lang='ts' setup>
 import CreateProject from './CreateProject.vue'
 import { ref, reactive, provide } from 'vue'
+import { annotationProjectStore } from '@/store/annotationProject'
+const projectStore = annotationProjectStore()
 const createAnnotationProject = () => {
-  openDialog.value= true
+  openDialog.value = true
 }
 const openDialog = ref<boolean>(false)
 provide('openDialog', openDialog)
+
 </script>
  
 <style scoped lang="less">
 .annotation-project-container {
   // background: #bfa;
+  background: #f7f7f7;
+  height: 100%;
+  box-sizing: border-box;
+
 }
 
 .project-header {
@@ -56,6 +66,7 @@ provide('openDialog', openDialog)
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   padding: 0 2%;
+  background: #fff;
 }
 
 .project-content {
@@ -75,6 +86,7 @@ provide('openDialog', openDialog)
     flex-direction: column;
     justify-content: space-between;
     transition: all 0.3s ease-in-out;
+    background: #fff;
 
     &:hover {
       transform: translateY(-8px)
