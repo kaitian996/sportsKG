@@ -1,106 +1,200 @@
 <template>
-    <main class="annotation-page-contanier">
-        <!-- 左侧菜单 -->
-        <section class="annotation-menus">
-            <!-- 开关按钮 -->
-            <div class="open-icon" @click="isCollapse=!isCollapse">
-                <el-icon :color="'#dcdfe6'" :size="25" v-if="!isCollapse" class="icon-item">
-                    <Fold />
-                </el-icon>
-                <el-icon :color="'#dcdfe6'" :size="25" v-if="isCollapse" class="icon-item">
-                    <Expand />
-                </el-icon>
+  <main class="annotation-project-container">
+    <!-- 头部的条 -->
+    <div class="project-header">
+      <!-- 左侧 -->
+      <div class="left">
+        <div class="title">
+          项目总览
+        </div>
+      </div>
+      <!-- 右侧 -->
+      <div class="right">
+        <el-button type="primary" @click="createAnnotationProject">创建项目</el-button>
+      </div>
+    </div>
+    <!-- 项目主体 -->
+    <div class="project-content">
+      <!-- 项目主体卡片 -->
+      <div class="project-item" v-for="item,index in projectStore.annotationProject">
+        <!-- 上部 -->
+        <div class="top-content">
+          <div class="item-title">
+            <div class="item-name">
+              {{item.name}}
             </div>
+            <div class="item-btn" @click="openMenu=!openMenu">
+              <el-icon size="20px">
+                <More />
+              </el-icon>
+            </div>
+            <div class="btn-container" v-if="openMenu">
+              <div class="btn" @click="toDetail">
+                详情
+              </div>
+              <div class="btn" @click="deleteProject(index)">
+                删除项目
+              </div>
+            </div>
+          </div>
+          <div class="item-info">
 
-            <el-menu router default-active="home" class="menus-wapper" :collapse="isCollapse">
-                <el-menu-item index="home">
-                    <el-icon>
-                        <Document />
-                    </el-icon>
-                    <template #title>
-                        首页
-                    </template>
-                </el-menu-item>
-                <el-menu-item index="annotation-project">
-                    <el-icon>
-                        <Setting />
-                    </el-icon>
-                    <template #title>项目管理</template>
-                </el-menu-item>
-                <el-menu-item index="text-annotation">
-                    <el-icon>
-                        <Location />
-                    </el-icon>
-                    <template #title>文本标注</template>
-                </el-menu-item>
-                <el-menu-item index="annotation-database">
-                    <el-icon>
-                        <IconMenu />
-                    </el-icon>
-                    <template #title>数据管理</template>
-                </el-menu-item>
-            </el-menu>
-        </section>
-        <!--右侧路由展示 -->
-        <section class="annotation-content">
-            <router-view></router-view>
-        </section>
-    </main>
+          </div>
+        </div>
+        <!-- 下部 -->
+        <div class="buttom-content">
+          <div class="item-description">
+            {{item.description}}
+          </div>
+          <div class="item-date">
+            {{item.date}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <el-empty description="暂无项目,请点击右上角创建项目" v-if="projectStore.annotationProject.length===0" />
+    <!-- 创建项目的遮罩层 -->
+    <CreateProject></CreateProject>
+  </main>
 </template>
  
  
 <script lang='ts' setup>
-import { Document, Menu as IconMenu, Location, Setting, Fold, Expand, ArrowDown } from '@element-plus/icons-vue'
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-//是否折叠
-const isCollapse = ref<boolean>(false)
+import CreateProject from './CreateProject.vue'
+import { More } from '@element-plus/icons-vue'
+import { ref, reactive, provide } from 'vue'
+import { annotationProjectStore } from '@/store/annotationProject'
+import { ElNotification } from 'element-plus';
+const projectStore = annotationProjectStore()
+const createAnnotationProject = () => {
+  openDialog.value = true
+  openMenu.value = !openMenu.value
+}
+const openDialog = ref<boolean>(false)
+provide('openDialog', openDialog)
 
+// 
+const openMenu = ref<boolean>(false)
+const toDetail = () => {
+
+}
+const deleteProject = (index: number) => {
+  projectStore.annotationProject.splice(index, 1)
+  ElNotification.success({
+    title: '删除项目',
+    message: '删除项目成功'
+  })
+  openMenu.value = !openMenu.value
+}
 </script>
  
 <style scoped lang="less">
-.annotation-page-contanier {
-    display: flex;
-    box-sizing: border-box;
+.annotation-project-container {
+  // background: #bfa;
+  background: #f7f7f7;
+  height: 100vh;
+  overflow: auto;
+  box-sizing: border-box;
+
 }
 
-.annotation-menus {
-    padding-top: 40px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
+.project-header {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  padding: 0 2%;
+  background: #fff;
+}
+
+.project-content {
+  display: flex;
+  justify-content: flex-start;
+  padding: 2% 1%;
+  flex-wrap: wrap;
+  margin: 0 auto;
+
+  .project-item {
+    margin: 2% 1%;
+    height: 150px;
+    width: 300px;
+    border: 1px solid #dcdfe6;
+    border-radius: 3px;
+    transition: all 0.3s ease-in-out;
+    background: #fff;
     box-sizing: border-box;
-    border-right: solid 1px #dcdfe6;
-    .open-icon {
-        position: absolute;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    padding: 1%;
+
+    .top-content {
+      height: 60px;
+      border-bottom: solid 1px #dcdfe6;
+
+      .item-title {
         box-sizing: border-box;
-        top: 0;
-        width: 100%;
-        z-index: 5;
-        border-bottom: solid 1px #dcdfe6;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
 
-        &:hover {
-            background: rgba(0, 0, 0, .025);
+        .item-name {
+          width: 80%;
+          overflow: hidden;
+          flex: none;
+          font-size: 16px;
+          font-weight: 500;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
+
+        .item-btn {
+          width: 10%;
+          flex: none;
+          text-align: center;
+          vertical-align: middle;
+          position: relative;
+
+
+        }
+
+        .btn-container {
+          text-align: left;
+          font-size: 13px;
+          position: absolute;
+          // width: 60px;
+          // height: 40px;
+          right: 30px;
+          top: 0;
+          box-sizing: border-box;
+          padding: 2px;
+          border: 1px solid #dcdfe6;
+
+          .btn {
+            cursor: pointer;
+            margin: 5px;
+
+            &:hover {
+              background: #dcdfe6;
+            }
+          }
+        }
+      }
     }
 
-    .menus-wapper {
-        font-size: 25px;
-        border: none;
-        &:not(.el-menu--collapse) {
-            width: 200px;
-            min-height: 400px;
-        }
-    }
-}
+    .buttom-content {
+      position: relative;
+      box-sizing: border-box;
+      max-height: 90px;
+      color: #7b7b7e;
 
-.annotation-content {
-    flex-grow: 1;
-    max-height: 100vh;
-    overflow: auto;
+      .item-description {
+        box-sizing: border-box;
+        padding: 2% 0;
+        height: 40px;
+        font-size: 16px;
+        overflow: hidden;
+      }
+    }
+  }
 }
 </style>

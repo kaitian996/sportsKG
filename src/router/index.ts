@@ -15,26 +15,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/annotation',
-    component: () => import('../views/AnnotationPage/index.vue'),
-    redirect: '/annotation/home',
-    children: [
-      {
-        path: 'home',
-        component: () => import('../views/AnnotationPage/pages/Home/index.vue')
-      },
-      {
-        path: 'annotation-project',
-        component: () => import('../views/AnnotationPage/pages/AnnotationProject/index.vue')
-      },
-      {
-        path: 'annotation-database',
-        component: () => import('../views/AnnotationPage/pages/DataBase/index.vue')
-      },
-      {
-        path: 'text-annotation',
-        component: () => import('../views/AnnotationPage/pages/TextAnnotation/index.vue')
-      }
-    ]
+    component: () => import('../views/AnnotationPage/index.vue')
   }
 ]
 
