@@ -339,7 +339,7 @@ const addLabel = (index: number, add: boolean = false) => {
     if (!add) {
         const isExisted = projectData.labelCategories.findIndex(item => item.text === defaultLabelCategories[index].text)
         if (isExisted === -1) {
-            projectData.labelCategories.push({
+            projectData.labelCategories.unshift({
                 text: defaultLabelCategories[index].text,
                 color: defaultLabelCategories[index].color
             })
@@ -350,7 +350,7 @@ const addLabel = (index: number, add: boolean = false) => {
         if (newLabel.value === '') return
         const isExisted = projectData.labelCategories.findIndex(item => item.text === newLabel.value)
         if (isExisted === -1) {
-            projectData.labelCategories.push({
+            projectData.labelCategories.unshift({
                 text: newLabel.value,
                 color: '#95e1d3'
             })
@@ -366,7 +366,7 @@ const addConnection = (index: number, add: boolean = false) => {
     if (add === false) {
         const isExisted = projectData.connectionCategories.findIndex(item => item.text === defaultConnectionCategories[index].text)
         if (isExisted === -1) {
-            projectData.connectionCategories.push({
+            projectData.connectionCategories.unshift({
                 text: defaultConnectionCategories[index].text,
             })
         } else {
@@ -376,7 +376,7 @@ const addConnection = (index: number, add: boolean = false) => {
         if (newConnection.value === '') return
         const isExisted = projectData.connectionCategories.findIndex(item => item.text === newConnection.value)
         if (isExisted === -1) {
-            projectData.connectionCategories.push({
+            projectData.connectionCategories.unshift({
                 text: newConnection.value
             })
             newConnection.value = ''

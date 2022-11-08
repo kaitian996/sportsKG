@@ -5,7 +5,7 @@
       <!-- 左侧 -->
       <div class="left">
         <div class="title">
-          项目总览
+          项目
         </div>
       </div>
       <!-- 右侧 -->
@@ -23,12 +23,12 @@
             <div class="item-name">
               {{item.name}}
             </div>
-            <div class="item-btn" @click="openMenu=!openMenu">
+            <div class="item-btn" @click="openMenu(index)">
               <el-icon size="20px">
                 <More />
               </el-icon>
             </div>
-            <div class="btn-container" v-if="openMenu">
+            <div class="btn-container" v-if="openMenuIndex===index">
               <div class="btn" @click="toDetail">
                 详情
               </div>
@@ -68,13 +68,21 @@ import { ElNotification } from 'element-plus';
 const projectStore = annotationProjectStore()
 const createAnnotationProject = () => {
   openDialog.value = true
-  openMenu.value = !openMenu.value
+  openMenuIndex.value = -1
 }
 const openDialog = ref<boolean>(false)
 provide('openDialog', openDialog)
 
 // 
-const openMenu = ref<boolean>(false)
+const openMenuIndex = ref<number>(-1)
+const openMenu = (index: number) => {
+  if (openMenuIndex.value === index) {
+    openMenuIndex.value = -1
+  } else {
+    openMenuIndex.value = index
+  }
+
+}
 const toDetail = () => {
 
 }
@@ -84,7 +92,7 @@ const deleteProject = (index: number) => {
     title: '删除项目',
     message: '删除项目成功'
   })
-  openMenu.value = !openMenu.value
+  openMenuIndex.value = -1
 }
 </script>
  
@@ -99,6 +107,8 @@ const deleteProject = (index: number) => {
 }
 
 .project-header {
+  position:sticky;
+  top: 0;
   height: 50px;
   display: flex;
   justify-content: space-between;
@@ -107,6 +117,12 @@ const deleteProject = (index: number) => {
   box-sizing: border-box;
   padding: 0 2%;
   background: #fff;
+  .left{
+    .title{
+      font-size: 18px;
+      font-weight: 500;
+    }
+  }
 }
 
 .project-content {
@@ -117,7 +133,7 @@ const deleteProject = (index: number) => {
   margin: 0 auto;
 
   .project-item {
-    margin: 2% 1%;
+    margin: 1% 1%;
     height: 150px;
     width: 300px;
     border: 1px solid #dcdfe6;

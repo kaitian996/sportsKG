@@ -59,8 +59,8 @@ export const annotationProjectStore = defineStore('annotationProjectStore', {
             }[];
         }) {
 
-            const data = projectData.data.map((item, index) => {
-                const labelCategories = projectData.labelCategories.map((item, index) => {
+            const data = projectData.data.map((item) => {
+                const labelCategories = projectData.labelCategories.reverse().map((item, index) => {
                     return {
                         id: index,
                         text: item.text,
@@ -68,7 +68,7 @@ export const annotationProjectStore = defineStore('annotationProjectStore', {
                         borderColor: '#a38671'
                     }
                 })
-                const connectionCategories = projectData.connectionCategories.map((item, index) => {
+                const connectionCategories = projectData.connectionCategories.reverse().map((item, index) => {
                     return {
                         id: index,
                         text: item.text
@@ -85,8 +85,8 @@ export const annotationProjectStore = defineStore('annotationProjectStore', {
                 description: projectData.description,
                 date: projectData.date,
                 data: data,
-                labelCategories: projectData.labelCategories,
-                connectionCategories: projectData.connectionCategories,
+                labelCategories: projectData.labelCategories.reverse(),
+                connectionCategories: projectData.connectionCategories.reverse(),
             })
         }
     }
