@@ -80,19 +80,16 @@
           border-radius: none !important;
           padding: 0 !important;
       }
-
+      .view-content > svg{
+        width: 100%;
+      }
       /* 内容 */
       .poplar-annotation-content {
-          font-size: 1.25rem !important;
-          font-weight: 500 !important;
-          line-height: 2rem !important;
-          font-family: "Roboto", sans-serif !important;
-          opacity: .6;
-          width: 95% !important;
-          letter-spacing: 5px;
+          font-size: 1em !important;
+          letter-spacing: 2px;
 
       }
-
+      
       /* Label */
       .poplar-annotation-label {
           font-family: "PingFang SC", serif;

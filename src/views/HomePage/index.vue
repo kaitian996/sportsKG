@@ -3,7 +3,7 @@
         <!-- 中间图片 -->
         <section class="image-container">
             <!-- 头部组件 -->
-            <Header :isWhiteImage="false" :isWhiteText="'#0069c2'"></Header>
+            <Header isWhiteImage :isWhiteText="'#0069c2'"></Header>
             <!-- 功能区介绍 -->
             <ul class="top-show-warpper">
                 <li class="icon-item">
