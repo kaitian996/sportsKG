@@ -1,93 +1,41 @@
-import { useCreateAnnotationData } from "@/hooks/useCreateAnnotationData";
+import {
+    connectionCategories,
+    connections,
+    labelCategories,
+    labels,
+} from "@/hooks/useCreateAnnotationData"
 import { defineStore } from "pinia" // 定义容器
-type annotationDataType = {
-    content: string;
-    labelCategories: {
-        id: number;
-        text: string;
-        color: string;
-        borderColor: string;
-    }[];
-    labels: { id: number; categoryId: number; startIndex: number; endIndex: number }[];
-    connectionCategories: {
-        id: number;
-        text: string;
-    }[];
-    connections: { id: number; categoryId: number; fromId: number; toId: number }[];
+export type annotationDataType = {
+    content: string
+    labelCategories: labelCategories[]
+    labels: labels[]
+    connectionCategories: connectionCategories[]
+    connections: connections[]
 }
-type annotationProject = {
-    name: string;
-    description: string;
-    date: string;
+export type annotationProject = {
+    name: string
+    description: string
+    date: string
     data: {
-        fileName: string;
-        fileContent: string;
-        annotationData: annotationDataType
-    }[];
-    labelCategories: {
-        text: string;
-        color: string;
-    }[];
-    connectionCategories: {
-        text: string;
-    }[];
+        fileName: string
+        fileContent: string
+        labels: labels[]
+        connections: connections[]
+        state: string
+    }[]
+    labelCategories: labelCategories[]
+    connectionCategories: connectionCategories[]
 }
-export const annotationProjectStore = defineStore('annotationProjectStore', {
+export const annotationProjectStore = defineStore("annotationProjectStore", {
     state: () => {
         return {
-            annotationProject: [] as annotationProject[]
+            annotationProject: [] as annotationProject[],
         }
     },
-    getters: {
-
-    },
+    getters: {},
     actions: {
-        createAnnotationProject(projectData: {
-            name: string;
-            description: string;
-            date: string;
-            data: {
-                fileName: string;
-                fileContent: string;
-            }[];
-            labelCategories: {
-                text: string;
-                color: string;
-            }[];
-            connectionCategories: {
-                text: string;
-            }[];
-        }) {
-
-            const data = projectData.data.map((item) => {
-                const labelCategories = projectData.labelCategories.reverse().map((item, index) => {
-                    return {
-                        id: index,
-                        text: item.text,
-                        color: item.color,
-                        borderColor: '#a38671'
-                    }
-                })
-                const connectionCategories = projectData.connectionCategories.reverse().map((item, index) => {
-                    return {
-                        id: index,
-                        text: item.text
-                    }
-                })
-                return {
-                    fileName: item.fileName,
-                    fileContent: item.fileContent,
-                    annotationData: useCreateAnnotationData(item.fileContent, labelCategories, connectionCategories)
-                }
-            })
-            this.annotationProject.push({
-                name: projectData.name,
-                description: projectData.description,
-                date: projectData.date,
-                data: data,
-                labelCategories: projectData.labelCategories.reverse(),
-                connectionCategories: projectData.connectionCategories.reverse(),
-            })
-        }
-    }
+        createAnnotationProject(projectData: annotationProject) {
+            this.annotationProject.push(projectData)
+        },
+    },
 })

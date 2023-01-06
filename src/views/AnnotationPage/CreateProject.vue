@@ -35,8 +35,8 @@
                         </div>
                     </div>
                     <div class="right-button">
-                        <el-button>取消</el-button>
-                        <el-button>保存</el-button>
+                        <el-button @click="close">取消</el-button>
+                        <el-button @click="saveProject">保存</el-button>
                     </div>
                 </div>
             </template>
@@ -119,27 +119,31 @@
                     </div>
                 </div>
                 <!-- 项目配置 -->
-                <div class="project-config" v-if="activeStep == 2">
+                <div class="project-config" v-show="activeStep == 2">
                     <div class="left-menu">
                         <div class="set-area">
                             <div class="set-title">
-                                {{ areaIndx === 0 ? "标签域" : "关系域" }}
+                                {{
+                                    areaIndex === 0
+                                        ? "实体标签域"
+                                        : "实体关系域"
+                                }}
                             </div>
                             <div class="set-content">
                                 <div
-                                    @click="setAreaIndx(0)"
+                                    @click="setareaIndex(0)"
                                     class="set-item"
                                     :class="
-                                        areaIndx === 0 ? 'set-item-active' : ''
+                                        areaIndex === 0 ? 'set-item-active' : ''
                                     "
                                 >
                                     labelCategories
                                 </div>
                                 <div
-                                    @click="setAreaIndx(1)"
+                                    @click="setareaIndex(1)"
                                     class="set-item"
                                     :class="
-                                        areaIndx === 1 ? 'set-item-active' : ''
+                                        areaIndex === 1 ? 'set-item-active' : ''
                                     "
                                 >
                                     connectionCategories
@@ -147,20 +151,22 @@
                             </div>
                         </div>
                         <!-- 标签域 -->
-                        <div class="label-area" v-if="areaIndx === 0">
+                        <div class="label-area" v-if="areaIndex === 0">
                             <!-- 设置标签域 -->
                             <div class="set-label-block">
                                 <!-- 左侧输入框 -->
                                 <div class="left-input">
-                                    <div class="label-title">标签添加</div>
+                                    <div class="label-title">实体标签添加</div>
                                     <!-- 从已有添加的添加 -->
                                     <div class="add-from-old">
-                                        <div class="add-old">从已有添加</div>
+                                        <div class="add-old">
+                                            从已有实体标签添加
+                                        </div>
                                         <el-select
                                             multiple
                                             collapse-tags
                                             collapse-tags-tooltip
-                                            placeholder="从已有标签中选择"
+                                            placeholder="从已有实体标签中选择"
                                             style="width: 240px"
                                             v-model="
                                                 projectData.labelCategories
@@ -176,13 +182,13 @@
                                         </el-select>
                                     </div>
                                     <div class="add-from-new">
-                                        <div class="add-new">新建标签</div>
+                                        <div class="add-new">新建实体标签</div>
                                         <el-input
                                             v-model="newLabel"
                                             type="textarea"
                                             :rows="4"
                                             class="new-input"
-                                            placeholder="输入标签"
+                                            placeholder="输入实体标签"
                                         />
                                         <el-button
                                             @click="addNewLabel"
@@ -194,7 +200,7 @@
                                 <!-- 右侧展示表 -->
                                 <div class="right-show">
                                     <div class="show-title">
-                                        标签设置({{
+                                        实体标签设置({{
                                             projectData.labelCategories.length
                                         }})
                                     </div>
@@ -257,15 +263,110 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="connect-area" v-if="areaIndx === 1"></div>
+                        <div class="connect-area" v-if="areaIndex === 1">
+                            <div class="set-label-block">
+                                <!-- 左侧输入框 -->
+                                <div class="left-input">
+                                    <div class="label-title">实体关系添加</div>
+                                    <!-- 从已有添加的添加 -->
+                                    <div class="add-from-old">
+                                        <div class="add-old">
+                                            从已有实体关系添加
+                                        </div>
+                                        <el-select
+                                            multiple
+                                            collapse-tags
+                                            collapse-tags-tooltip
+                                            placeholder="从已有实体关系中选择"
+                                            style="width: 240px"
+                                            v-model="
+                                                projectData.connectionCategories
+                                            "
+                                            value-key="text"
+                                        >
+                                            <el-option
+                                                v-for="item in defaultConnectionCategories"
+                                                :key="item.text"
+                                                :label="item.text"
+                                                :value="item"
+                                            />
+                                        </el-select>
+                                    </div>
+                                    <div class="add-from-new">
+                                        <div class="add-new">新建实体关系</div>
+                                        <el-input
+                                            v-model="newConnection"
+                                            type="textarea"
+                                            :rows="4"
+                                            class="new-input"
+                                            placeholder="输入实体关系"
+                                        />
+                                        <el-button
+                                            @click="addNewConnection"
+                                            class="new-button"
+                                            >添加</el-button
+                                        >
+                                    </div>
+                                </div>
+                                <!-- 右侧展示表 -->
+                                <div class="right-show">
+                                    <div class="show-title">
+                                        实体关系设置({{
+                                            projectData.connectionCategories
+                                                .length
+                                        }})
+                                    </div>
+                                    <div class="show-content">
+                                        <div
+                                            class="show-item"
+                                            v-for="(
+                                                item, index
+                                            ) in projectData.connectionCategories"
+                                        >
+                                            <div
+                                                class="header-show"
+                                                :style="'background:#95e1d3'"
+                                            ></div>
+                                            <div
+                                                class="content-show"
+                                                :style="'--background:#95e1d326'"
+                                            >
+                                                <span class="label-code">
+                                                    {{ item.text }}
+                                                </span>
+                                            </div>
+                                            <div
+                                                class="remove-show"
+                                                @click="removeConnection(index)"
+                                            >
+                                                <svg
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 14 14"
+                                                    fill="none"
+                                                    stroke="red"
+                                                    stroke-width="2"
+                                                    stroke-linecap="square"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path d="M2 12L12 2"></path>
+                                                    <path d="M12 12L2 2"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="right-content">
                         <div class="ui-title">UI预览</div>
                         <div class="ui-view">
-                            <div class="view-tags">
+                            <div class="view-tags" v-if="areaIndex === 0">
                                 <div
                                     class="tag-item"
                                     v-for="item in computedAnnotationData.labelCategories"
+                                    @click="currentSelectLabel = item.id!"
                                 >
                                     <div
                                         class="tag-head"
@@ -282,52 +383,172 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="view-tags" v-if="areaIndex === 1">
+                                <div
+                                    class="tag-item"
+                                    v-for="item in computedAnnotationData.connectionCategories"
+                                    @click="currentSelectConnection = item.id!"
+                                >
+                                    <div
+                                        class="tag-head"
+                                        :style="`--color:#95e1d3`"
+                                    ></div>
+                                    <div
+                                        class="tag-content"
+                                        :style="`--color:#95e1d326`"
+                                    >
+                                        <span class="tag-text">{{
+                                            item.text
+                                        }}</span>
+                                        <span class="tag-hotkey">1</span>
+                                    </div>
+                                </div>
+                            </div>
                             <div
                                 class="view-content"
                                 ref="annotationContainer"
                             ></div>
                             <div class="view-data">
-                                <div class="data-title">标注结果</div>
+                                <div class="data-title">
+                                    {{
+                                        areaIndex === 0
+                                            ? "Labels标注结果"
+                                            : "Connections标注结果"
+                                    }}
+                                </div>
                                 <div class="data-list">
-                                    <div class="label-list">
-                                        <div
-                                            class="empty-list"
-                                            v-if="
-                                                computedAnnotationData.labels
-                                                    .length === 0
-                                            "
+                                    <div
+                                        class="label-list"
+                                        v-if="areaIndex === 0"
+                                    >
+                                        <el-table
+                                            height="200"
+                                            :data="projectData.onceLabels"
+                                            style="width: 100%"
                                         >
-                                            暂无标注
-                                        </div>
-                                        <div
-                                            class="lablei-list-item"
-                                            v-for="(
-                                                item, index
-                                            ) in computedAnnotationData.labels"
-                                        >
-                                            <div class="item-id">
-                                                {{ index }}
-                                            </div>
-                                            <div class="item-type">
-                                                {{
-                                                    computedAnnotationData.labelCategories.filter(
-                                                        (label) =>
-                                                            label.id ===
-                                                            item.categoryId
-                                                    )[0].text
-                                                }}
-                                            </div>
-                                            <div class="item-content">
-                                                {{
-                                                    computedAnnotationData.content.slice(
-                                                        item.startIndex,
-                                                        item.endIndex
-                                                    )
-                                                }}
-                                            </div>
-                                        </div>
+                                            <el-table-column
+                                                label="ID"
+                                                min-width="200"
+                                            >
+                                                <template #default="scope">
+                                                    {{ scope.$index }}
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column
+                                                label="标签名称"
+                                                min-width="200"
+                                            >
+                                                <template #default="scope">
+                                                    {{
+                                                        computedAnnotationData.labelCategories.find(
+                                                            (item) =>
+                                                                item.id ===
+                                                                Number(
+                                                                    scope.row
+                                                                        .categoryId
+                                                                )
+                                                        )?.text
+                                                    }}
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column
+                                                label="实体内容"
+                                                min-width="200"
+                                            >
+                                                <template #default="scope">
+                                                    {{
+                                                        computedAnnotationData.content.slice(
+                                                            scope.row
+                                                                .startIndex,
+                                                            scope.row.endIndex
+                                                        )
+                                                    }}
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
                                     </div>
-                                    <div class="connect-list"></div>
+                                    <div
+                                        class="connect-list"
+                                        v-if="areaIndex === 1"
+                                    >
+                                        <el-table
+                                            height="200"
+                                            :data="projectData.onceConnections"
+                                            style="width: 100%"
+                                        >
+                                            <el-table-column
+                                                label="ID"
+                                                min-width="100"
+                                            >
+                                                <template #default="scope">
+                                                    {{ scope.$index }}
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column
+                                                label="结束实体"
+                                                min-width="100"
+                                            >
+                                                <template #default="scope">
+                                                    {{
+                                                        computedAnnotationData.content.slice(
+                                                            projectData.onceLabels.find(
+                                                                (label) =>
+                                                                    label.id ===
+                                                                    scope.row
+                                                                        .fromId
+                                                            )?.startIndex,
+                                                            projectData.onceLabels.find(
+                                                                (label) =>
+                                                                    label.id ===
+                                                                    scope.row
+                                                                        .fromId
+                                                            )?.endIndex
+                                                        )
+                                                    }}
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column
+                                                label="实体关系"
+                                                min-width="100"
+                                            >
+                                                <template #default="scope">
+                                                    {{
+                                                        computedAnnotationData.connectionCategories.find(
+                                                            (item) =>
+                                                                item.id ===
+                                                                Number(
+                                                                    scope.row
+                                                                        .categoryId
+                                                                )
+                                                        )?.text
+                                                    }}
+                                                </template>
+                                            </el-table-column>
+                                            <el-table-column
+                                                label="终止实体"
+                                                min-width="100"
+                                            >
+                                                <template #default="scope">
+                                                    {{
+                                                        computedAnnotationData.content.slice(
+                                                            projectData.onceLabels.find(
+                                                                (label) =>
+                                                                    label.id ===
+                                                                    scope.row
+                                                                        .toId
+                                                            )?.startIndex,
+                                                            projectData.onceLabels.find(
+                                                                (label) =>
+                                                                    label.id ===
+                                                                    scope.row
+                                                                        .toId
+                                                            )?.endIndex
+                                                        )
+                                                    }}
+                                                </template>
+                                            </el-table-column>
+                                        </el-table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -358,8 +579,17 @@ import {
     onMounted,
     nextTick,
 } from "vue"
-import { annotationProjectStore } from "@/store/annotationProject"
-import { useCreateAnnotationData } from "@/hooks/useCreateAnnotationData"
+import {
+    annotationProject,
+    annotationProjectStore,
+} from "@/store/annotationProject"
+import {
+    useCreateAnnotationData,
+    labels,
+    connections,
+    labelCategories,
+    connectionCategories,
+} from "@/hooks/useCreateAnnotationData"
 import { Annotator, Action } from "poplar-annotation"
 
 const openDialog = inject("openDialog") as Ref<boolean>
@@ -368,13 +598,17 @@ const activeStepSet = (index: number) => {
     activeStep.value = index
 }
 //项目数据
-const projectData = reactive({
+const projectData = reactive<
+    annotationProject & { onceLabels: labels[]; onceConnections: connections[] }
+>({
     name: "",
     description: "",
     date: "",
-    data: [] as { fileName: string; fileContent: string }[],
-    labelCategories: [] as { text: string; color: string }[],
-    connectionCategories: [] as { text: string }[],
+    data: [],
+    labelCategories: [],
+    connectionCategories: [],
+    onceLabels: [],
+    onceConnections: [],
 })
 const formRule = reactive({
     name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
@@ -382,10 +616,16 @@ const formRule = reactive({
 /**
  * 项目设置
  */
-const areaIndx = ref(0)
-const setAreaIndx = (index: number) => {
-    areaIndx.value = index
+const areaIndex = ref(0)
+const setareaIndex = (index: number) => {
+    areaIndex.value = index
 }
+watch(areaIndex, () => {
+    textSelector.startIndex = -1
+    textSelector.endIndex = -1
+    labelSelector.fromId = -1
+    labelSelector.toId = -1
+})
 const defaultLabelCategories = [
     {
         text: "B-LOC",
@@ -489,52 +729,35 @@ const setLabelColor = (className: string) => {
 }
 const defaultConnectionCategories = [
     {
-        text: "某种关系1",
+        text: "名词",
     },
     {
-        text: "某种关系2",
+        text: "实词",
     },
     {
-        text: "某种关系3",
+        text: "代词",
     },
     {
-        text: "某种关系4",
+        text: "形容词",
     },
 ]
 const newConnection = ref<string>("")
-const addConnection = (index: number, add: boolean = false) => {
-    if (add === false) {
-        const isExisted = projectData.connectionCategories.findIndex(
-            (item) => item.text === defaultConnectionCategories[index].text
-        )
-        if (isExisted === -1) {
-            projectData.connectionCategories.unshift({
-                text: defaultConnectionCategories[index].text,
-            })
-        } else {
-            ElMessage.info("已存在此关系,请勿重复添加！")
-        }
+const addNewConnection = () => {
+    if (!newConnection.value) return
+    const isExisted = projectData.connectionCategories.findIndex(
+        (item) => item.text === newConnection.value
+    )
+    if (isExisted !== -1) {
+        ElMessage.info(`已添加${newConnection.value}关系`)
     } else {
-        if (newConnection.value === "") return
-        const isExisted = projectData.connectionCategories.findIndex(
-            (item) => item.text === newConnection.value
-        )
-        if (isExisted === -1) {
-            projectData.connectionCategories.unshift({
-                text: newConnection.value,
-            })
-            newConnection.value = ""
-        } else {
-            ElMessage.info("已存在此关系,请勿重复添加！")
-        }
+        projectData.connectionCategories.push({
+            text: newConnection.value,
+        })
     }
+    newConnection.value = ""
 }
-const deleteLabelOrConnection = (index: number, con: boolean = false) => {
-    if (con) {
-        projectData.connectionCategories.splice(index, 1)
-    } else {
-        projectData.labelCategories.splice(index, 1)
-    }
+const removeConnection = (index: number) => {
+    projectData.connectionCategories.splice(index, 1)
 }
 /**
  * 上传功能
@@ -548,6 +771,9 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
             projectData.data.push({
                 fileName: file.name,
                 fileContent: r,
+                labels: [],
+                connections: [],
+                state: "pending",
             })
         )
     })
@@ -573,7 +799,9 @@ const computedAnnotationData = computed(() => {
                 id: index,
                 text: item.text,
             }
-        })
+        }),
+        [],
+        []
     )
 })
 const annotationContainer = ref<HTMLElement>()
@@ -582,9 +810,59 @@ const textSelector = reactive({
     startIndex: -1,
     endIndex: -1,
 })
+const currentSelectLabel = ref(-1)
+watch(currentSelectLabel, (newValue) => {
+    if (
+        newValue !== -1 &&
+        textSelector.startIndex !== -1 &&
+        textSelector.endIndex !== -1
+    ) {
+        //只有在三者不为初始条件时，才增加
+        if (annotator) {
+            annotator.applyAction(
+                Action.Label.Create(
+                    currentSelectLabel.value,
+                    textSelector.startIndex,
+                    textSelector.endIndex
+                )
+            )
+            projectData.onceLabels = annotator.store.json.labels
+        }
+        //重置状态
+        currentSelectLabel.value = -1
+        textSelector.startIndex = -1
+        textSelector.endIndex = -1
+    }
+})
+const labelSelector = reactive({
+    fromId: -1,
+    toId: -1,
+})
+const currentSelectConnection = ref(-1)
+watch(currentSelectConnection, (newValue) => {
+    if (
+        newValue !== -1 &&
+        labelSelector.fromId !== -1 &&
+        labelSelector.toId !== -1
+    ) {
+        //只有在三者不为初始条件时，才增加
+        if (annotator) {
+            annotator.applyAction(
+                Action.Connection.Create(
+                    currentSelectConnection.value,
+                    labelSelector.fromId,
+                    labelSelector.toId
+                )
+            )
+            projectData.onceConnections = annotator.store.json.connections
+        }
+        //重置状态
+        currentSelectConnection.value = -1
+        labelSelector.fromId = -1
+        labelSelector.toId = -1
+    }
+})
 const registerAnnotator = () => {
-    console.log("genxin annoto")
-
     if (annotator) {
         annotator.remove()
     }
@@ -595,34 +873,50 @@ const registerAnnotator = () => {
     )
     //标签增加删除
     annotator.on("textSelected", (startIndex: number, endIndex: number) => {
+        currentSelectLabel.value = -1
         textSelector.startIndex = startIndex
         textSelector.endIndex = endIndex
     })
     annotator.on("labelRightClicked", (id: number) => {
         annotator.applyAction(Action.Label.Delete(id))
+        projectData.onceLabels = annotator.store.json.labels
+    })
+    //关系增加删除
+    annotator.on("twoLabelsClicked", (fromId: number, toId: number) => {
+        labelSelector.fromId = fromId
+        labelSelector.toId = toId
+    })
+    annotator.on("connectionRightClicked", (id: number) => {
+        annotator.applyAction(Action.Connection.Delete(id))
+        projectData.onceConnections = annotator.store.json.connections
     })
 }
-
 watch(
     [
         () => computedAnnotationData.value.labelCategories.length,
-        () => computedAnnotationData.value.labelCategories.length,
+        () => computedAnnotationData.value.connectionCategories.length,
+        () => computedAnnotationData.value.labelCategories,
     ],
     (newValue) => {
-        if (newValue[0] !== 0 || newValue[1] !== 0) {
+        if (newValue[0] !== 0) {
+            projectData.onceLabels.length = 0
+            projectData.onceConnections.length = 0
             registerAnnotator()
         }
     }
 )
 watch(activeStep, (newValue, oldValue) => {
-    if (
-        newValue === 2 &&
-        (projectData.labelCategories.length === 0 ||
-            projectData.labelCategories.length === 0)
-    ) {
+    if (newValue === 2 && projectData.labelCategories.length === 0) {
         nextTick(() => {
             projectData.labelCategories.push(
                 ...defaultLabelCategories.slice(0, 3)
+            )
+        })
+    }
+    if (newValue === 2 && projectData.connectionCategories.length === 0) {
+        nextTick(() => {
+            projectData.connectionCategories.push(
+                ...defaultConnectionCategories.slice(0, 3)
             )
         })
     }
@@ -634,7 +928,29 @@ const saveProject = () => {
     projectData.date = `${nowDate.getFullYear()}-${
         nowDate.getMonth() + 1
     }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
-    projectStore.createAnnotationProject(projectData)
+
+    projectStore.createAnnotationProject({
+        name: projectData.name,
+        description: projectData.description,
+        date: projectData.date,
+        data: projectData.data,
+        labelCategories: projectData.labelCategories.map((item, index) => {
+            return {
+                id: index,
+                text: item.text,
+                color: item.color,
+                borderColor: "a38671",
+            }
+        }),
+        connectionCategories: projectData.connectionCategories.map(
+            (item, index) => {
+                return {
+                    id: index,
+                    text: item.text,
+                }
+            }
+        ),
+    })
     ;(openDialog as Ref<boolean>).value = false
     ElNotification.success({
         title: "项目创建",
@@ -789,7 +1105,8 @@ const saveProject = () => {
                     }
                 }
             }
-            .label-area {
+            .label-area,
+            .connect-area {
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                 height: 360px;
                 padding-bottom: 20px;
@@ -836,8 +1153,8 @@ const saveProject = () => {
                         flex: 1;
                         box-sizing: border-box;
                         .show-title {
-                            margin: 10px 0;
-                            margin-bottom: 20px;
+                            margin: 20px 0;
+
                             font-size: 20px;
                             font-weight: 400;
                             padding-left: 30px;
@@ -847,7 +1164,7 @@ const saveProject = () => {
                             padding-right: 20px;
                             max-height: 300px;
                             overflow: auto;
-
+                            min-height: 200px;
                             .show-item {
                                 cursor: pointer;
                                 display: flex;
@@ -942,13 +1259,15 @@ const saveProject = () => {
                 .view-content {
                     margin: 20px 0;
                     min-height: 30px;
+                    max-height: 150px;
+                    overflow: auto;
                 }
                 .view-data {
                     background: #fff;
                     .data-title {
                         font-size: 20px;
                         font-weight: 500;
-                        box-shadow: 0 1px 0 rgb(0 0 0 / 10%);
+                        border-bottom: 1px solid rgb(0 0 0 / 10%);
                         padding: 16px;
                     }
                     .data-list {
