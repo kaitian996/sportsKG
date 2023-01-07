@@ -791,7 +791,7 @@ const computedAnnotationData = computed(() => {
                 id: index,
                 text: item.text,
                 color: item.color,
-                borderColor: "a38671",
+                borderColor: "++a38671",
             }
         }),
         projectData.connectionCategories.map((item, index) => {
@@ -928,7 +928,13 @@ const saveProject = () => {
     projectData.date = `${nowDate.getFullYear()}-${
         nowDate.getMonth() + 1
     }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
-
+    if (!projectData.name) {
+        ElNotification.error({
+            title: "项目创建",
+            message: "项目创建失败，请输入项目名称",
+        })
+        return
+    }
     projectStore.createAnnotationProject({
         name: projectData.name,
         description: projectData.description,
@@ -950,6 +956,7 @@ const saveProject = () => {
                 }
             }
         ),
+        autoKey:[]
     })
     ;(openDialog as Ref<boolean>).value = false
     ElNotification.success({
@@ -1200,9 +1207,7 @@ const saveProject = () => {
                                     padding: 2px 6px;
 
                                     // width: 10px;
-                                    svg {
-                                        vertical-align: middle;
-                                    }
+                                   
                                     &:hover {
                                         background: rgba(255, 0, 0, 0.133);
                                     }

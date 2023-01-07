@@ -25,6 +25,7 @@ export type annotationProject = {
     }[]
     labelCategories: labelCategories[]
     connectionCategories: connectionCategories[]
+    autoKey?: { text: string; begin: number; inner: number; end: number }[]
 }
 export const annotationProjectStore = defineStore("annotationProjectStore", {
     state: () => {
