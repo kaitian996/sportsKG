@@ -7,7 +7,7 @@
                     >项目管理</el-breadcrumb-item
                 >
                 <el-breadcrumb-item
-                    :to="{ path: `/projectDetail?pID=${pID}` }"
+                    :to="{ path: `/projectDetail`, query: { pID } }"
                     >{{ currentProject.name }}</el-breadcrumb-item
                 >
                 <el-breadcrumb-item>{{
@@ -659,14 +659,22 @@
                     </div>
                 </div>
                 <!-- 删除项目 -->
-                <div class="content-project-delete" v-if="currentMenuIndex === 2">
+                <div
+                    class="content-project-delete"
+                    v-if="currentMenuIndex === 2"
+                >
                     <div class="delete-title">
                         <strong>警告：</strong>
                         删除此项目会同时删除项目中所包含的所有文件，并且删除所有标注数据、关系数据、标注配置等且无法恢复。
                     </div>
                     <div class="delete-btn">
                         <el-switch v-model="canDelete" />
-                        <el-button type="danger" :disabled="!canDelete">删除</el-button>
+                        <el-button
+                            type="danger"
+                            :disabled="!canDelete"
+                            @click="removeProject"
+                            >删除</el-button
+                        >
                     </div>
                 </div>
             </main>
@@ -684,19 +692,19 @@ import {
     nextTick,
     isReactive,
 } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { ArrowRight } from "@element-plus/icons-vue"
 import {
     annotationDataType,
     annotationProjectStore,
 } from "@/store/annotationProject"
-import { ElMessage } from "element-plus"
 import {
     connections,
     labels,
     useCreateAnnotationData,
 } from "@/hooks/useCreateAnnotationData"
 import { Annotator, Action } from "poplar-annotation"
+import { ElMessage, ElNotification } from "element-plus"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const currentProject = useProjection.annotationProject[pID]
@@ -1096,7 +1104,16 @@ watch(currentMenuIndex, (newValue, oldValue) => {
 })
 
 //删除界面
-const canDelete =ref(false)
+const canDelete = ref(false)
+const router = useRouter()
+const removeProject = () => {
+    useProjection.annotationProject.splice(pID, 1)
+    router.push("/annotation")
+    ElNotification.success({
+        title: "项目删除",
+        message: "成功删除项目",
+    })
+}
 </script>
 
 <style scoped lang="less">
@@ -1442,12 +1459,12 @@ const canDelete =ref(false)
                     }
                 }
             }
-            .content-project-delete{
-                width:50%;
-                padding:30px 20px;
-                .delete-btn{
+            .content-project-delete {
+                width: 50%;
+                padding: 30px 20px;
+                .delete-btn {
                     margin-top: 50px;
-                    .el-button{
+                    .el-button {
                         margin-left: 40px;
                     }
                 }
