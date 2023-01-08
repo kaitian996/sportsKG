@@ -183,7 +183,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="connect-area" v-if="areaIndex === 1">
+                        <div class="connect-area" v-show="areaIndex === 1">
                             <div class="set-label-block">
                                 <!-- 左侧输入框 -->
                                 <div class="left-input">
@@ -1060,7 +1060,6 @@ watch(
         computedAnnotationData.value.labelCategories,
     ],
     (newValue) => {
-        console.log(newValue)
         if (newValue[0] !== 0) {
             onceAnnotationData.onceLabels.length = 0
             onceAnnotationData.onceConnections.length = 0
@@ -1068,6 +1067,7 @@ watch(
         }
     }
 )
+let first = true
 watch(currentMenuIndex, (newValue, oldValue) => {
     nextTick(() => {
         if (newValue === 1 && currentProject.labelCategories.length === 0) {
@@ -1097,8 +1097,13 @@ watch(currentMenuIndex, (newValue, oldValue) => {
                     })
             )
         }
-        if (newValue === 1 && currentProject.labelCategories.length !== 0) {
+        if (
+            newValue === 1 &&
+            first &&
+            currentProject.labelCategories.length !== 0
+        ) {
             registerAnnotator()
+            first = false
         }
     })
 })
