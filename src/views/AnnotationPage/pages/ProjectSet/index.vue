@@ -659,6 +659,16 @@
                     </div>
                 </div>
                 <!-- 删除项目 -->
+                <div class="content-project-delete" v-if="currentMenuIndex === 2">
+                    <div class="delete-title">
+                        <strong>警告：</strong>
+                        删除此项目会同时删除项目中所包含的所有文件，并且删除所有标注数据、关系数据、标注配置等且无法恢复。
+                    </div>
+                    <div class="delete-btn">
+                        <el-switch v-model="canDelete" />
+                        <el-button type="danger" :disabled="!canDelete">删除</el-button>
+                    </div>
+                </div>
             </main>
         </section>
     </main>
@@ -727,7 +737,6 @@ const addNewLabel = () => {
 }
 //实体删除
 const removeLabel = (index: number) => {
-    currentProject.labelCategories.splice(index, 1)
     //TODO 这里有需要做的工作
     /**
      * 1、找到这个index所代表的id，然后在这个项目里，找labels和这个项目有关的标注，删除
@@ -761,7 +770,6 @@ const addNewConnection = () => {
     newConnection.value = ""
 }
 const removeConnection = (index: number) => {
-    currentProject.connectionCategories.splice(index, 1)
     /**
      * 1、找到index所代表的id
      * 2、删除对应的connect的对象
@@ -1086,6 +1094,9 @@ watch(currentMenuIndex, (newValue, oldValue) => {
         }
     })
 })
+
+//删除界面
+const canDelete =ref(false)
 </script>
 
 <style scoped lang="less">
@@ -1404,7 +1415,7 @@ watch(currentMenuIndex, (newValue, oldValue) => {
                         }
                         .tags-auto {
                             margin-bottom: 5px;
-                            border-bottom: 1px solid #fff;
+                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                         }
                         .view-content {
                             margin: 20px 0;
@@ -1428,6 +1439,16 @@ watch(currentMenuIndex, (newValue, oldValue) => {
                                 }
                             }
                         }
+                    }
+                }
+            }
+            .content-project-delete{
+                width:50%;
+                padding:30px 20px;
+                .delete-btn{
+                    margin-top: 50px;
+                    .el-button{
+                        margin-left: 40px;
                     }
                 }
             }
