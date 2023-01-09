@@ -80,7 +80,12 @@ a:focus {
     border-radius: none !important;
     padding: 0 !important;
 }
+/* 设置界面的标注 */
 .view-content > svg {
+    width: 100%;
+}
+/* 标注界面的标注 */
+.content-box-area > svg {
     width: 100%;
 }
 /* 内容 */

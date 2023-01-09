@@ -101,8 +101,7 @@
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
                     <template #default="scope">
-                        <!-- {{ scope.row.showData }} -->
-                        <el-button type="primary" :icon="Edit" />
+                        <el-button type="primary" :icon="Edit" @click="toTextAnnotation(Number(scope.$index))"/>
                         <el-popover
                             placement="top-start"
                             title="删除该文件及其标注"
@@ -294,6 +293,16 @@ const stateRef = ref(-1)
 const setState = (index: string, state: string) => {
     currentProject.data[Number(index)].state = state
     stateRef.value = -1
+}
+//去标注项目
+const toTextAnnotation =(tID:number)=>{
+    router.push({
+        path: "/textAnnotation",
+        query:{
+            pID,
+            tID,
+        }
+    })
 }
 //删除项目
 const deleteRef = ref(-1)

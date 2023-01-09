@@ -1,6 +1,6 @@
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue"
 /**
- * 
+ *
  * @param callback 窗口尺寸改变时需要执行的回调
  * @param delay 延迟时间
  */
@@ -9,7 +9,7 @@ export const useWindowResize = (callback: () => void, delay: number) => {
     const reDraw = () => {
         let internalID: any = null
         return () => {
-            clearTimeout(internalID);
+            clearTimeout(internalID)
             internalID = setTimeout(callback, delay)
         }
     }
@@ -18,5 +18,27 @@ export const useWindowResize = (callback: () => void, delay: number) => {
     })
     onUnmounted(() => {
         window.removeEventListener("resize", reDraw())
+    })
+}
+export const useElementResize = (
+    selector: string,
+    callback: () => void,
+    delay: number
+) => {
+    //调整窗口回调
+    const reDraw = () => {
+        let internalID: any = null
+        return () => {
+            clearTimeout(internalID)
+            internalID = setTimeout(callback, delay)
+        }
+    }
+    onMounted(() => {
+        const el = document.querySelector(`.${selector}`)
+        el && el.addEventListener("resize", reDraw())
+    })
+    onUnmounted(() => {
+        const el = document.querySelector(`.${selector}`)
+        el && el.removeEventListener("resize", reDraw())
     })
 }
