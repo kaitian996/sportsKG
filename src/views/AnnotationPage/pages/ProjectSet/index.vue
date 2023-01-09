@@ -589,7 +589,7 @@
                                                 </template>
                                             </el-table-column>
                                             <el-table-column
-                                                label="结束实体"
+                                                label="起始实体"
                                                 min-width="100"
                                             >
                                                 <template #default="scope">
@@ -970,20 +970,20 @@ watch(currentSelectLabel, (newValue) => {
                         textSelector.startIndex + 1
                     )
                 )
-                //增加尾
-                annotator.applyAction(
-                    Action.Label.Create(
-                        end,
-                        textSelector.endIndex - 1,
-                        textSelector.endIndex
-                    )
-                )
                 //增加中间
                 annotator.applyAction(
                     Action.Label.Create(
                         inner,
                         textSelector.startIndex + 1,
                         textSelector.endIndex - 1
+                    )
+                )
+                //增加尾
+                annotator.applyAction(
+                    Action.Label.Create(
+                        end,
+                        textSelector.endIndex - 1,
+                        textSelector.endIndex
                     )
                 )
             }

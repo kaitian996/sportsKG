@@ -75,6 +75,41 @@
                     </div>
                     <div class="data-order"></div>
                 </div>
+                <el-table
+                    :data="computedAnnotationData.labels"
+                    style="width: 100%"
+                    height="80vh"
+                    stripe
+                >
+                    <el-table-column
+                        label="标签名称"
+                        min-width="50"
+                        show-overflow-tooltip
+                    >
+                        <template #default="scope">
+                            {{
+                                computedAnnotationData.labelCategories.find(
+                                    (item) =>
+                                        item.id === Number(scope.row.categoryId)
+                                )?.text
+                            }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        label="标签内容"
+                        min-width="50"
+                        show-overflow-tooltip
+                    >
+                        <template #default="scope">
+                            {{
+                                computedAnnotationData.content.slice(
+                                    scope.row.startIndex,
+                                    scope.row.endIndex
+                                )
+                            }}
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
             <!-- 中间标注区域 -->
             <div class="annotator-area">
@@ -171,6 +206,63 @@
                     </div>
                     <div class="data-order"></div>
                 </div>
+                <el-table
+                    :data="computedAnnotationData.connections"
+                    style="width: 100%"
+                    height="80vh"
+                    stripe
+                >
+                    <el-table-column
+                        label="起始实体"
+                        min-width="50"
+                        show-overflow-tooltip
+                    >
+                        <template #default="scope">
+                            {{
+                                computedAnnotationData.content.slice(
+                                    computedAnnotationData.labels.find(
+                                        (label) => label.id === scope.row.fromId
+                                    )?.startIndex,
+                                    computedAnnotationData.labels.find(
+                                        (label) => label.id === scope.row.fromId
+                                    )?.endIndex
+                                )
+                            }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        label="实体关系"
+                        min-width="50"
+                        show-overflow-tooltip
+                    >
+                        <template #default="scope">
+                            {{
+                                computedAnnotationData.connectionCategories.find(
+                                    (item) =>
+                                        item.id === Number(scope.row.categoryId)
+                                )?.text
+                            }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        label="终止实体"
+                        min-width="50"
+                        show-overflow-tooltip
+                    >
+                        <template #default="scope">
+                            {{
+                                computedAnnotationData.content.slice(
+                                    computedAnnotationData.labels.find(
+                                        (label) => label.id === scope.row.toId
+                                    )?.startIndex,
+                                    computedAnnotationData.labels.find(
+                                        (label) => label.id === scope.row.toId
+                                    )?.endIndex
+                                )
+                            }}
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
         </section>
     </main>
@@ -304,20 +396,20 @@ watch(currentSelectLabel, (newValue) => {
                         textSelector.startIndex + 1
                     )
                 )
-                //增加尾
-                annotator.applyAction(
-                    Action.Label.Create(
-                        end,
-                        textSelector.endIndex - 1,
-                        textSelector.endIndex
-                    )
-                )
                 //增加中间
                 annotator.applyAction(
                     Action.Label.Create(
                         inner,
                         textSelector.startIndex + 1,
                         textSelector.endIndex - 1
+                    )
+                )
+                //增加尾
+                annotator.applyAction(
+                    Action.Label.Create(
+                        end,
+                        textSelector.endIndex - 1,
+                        textSelector.endIndex
                     )
                 )
                 currentTask.labels = annotator.store.json.labels
@@ -361,7 +453,7 @@ watch(currentSelectConnection, (newValue) => {
 
 //左右菜单改变时需要重新注册
 watch([leftOpen, rightOpen], () => {
-    console.log('reload');
+    console.log("reload")
     nextTick(registerAnnotator)
 })
 </script>

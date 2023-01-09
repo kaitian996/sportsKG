@@ -37,8 +37,8 @@
                 </el-table-column>
                 <el-table-column label="文件名" width="200">
                     <template #default="scope">
-                        <div style="font-weight: 600;">
-                          {{ scope.row.fileName }}
+                        <div style="font-weight: 600">
+                            {{ scope.row.fileName }}
                         </div>
                     </template>
                 </el-table-column>
@@ -101,7 +101,11 @@
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
                     <template #default="scope">
-                        <el-button type="primary" :icon="Edit" @click="toTextAnnotation(Number(scope.$index))"/>
+                        <el-button
+                            type="primary"
+                            :icon="Edit"
+                            @click="toTextAnnotation(Number(scope.$index))"
+                        />
                         <el-popover
                             placement="top-start"
                             title="删除该文件及其标注"
@@ -224,7 +228,7 @@ import {
 } from "@/store/annotationProject"
 import { ArrowRight, Edit, Delete, UploadFilled } from "@element-plus/icons-vue"
 import { useFileReader } from "@/hooks/useFileReader "
-import { ElNotification, UploadFile } from "element-plus"
+import { ElMessage, ElNotification, UploadFile } from "element-plus"
 import { connections, labels } from "@/hooks/useCreateAnnotationData"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
@@ -295,13 +299,18 @@ const setState = (index: string, state: string) => {
     stateRef.value = -1
 }
 //去标注项目
-const toTextAnnotation =(tID:number)=>{
+const toTextAnnotation = (tID: number) => {
+    if (currentProject.labelCategories.length === 0) {
+        return ElMessage.error(
+            "当前项目暂未设置标注标签，请先设置标注标签后再进行标注！"
+        )
+    }
     router.push({
         path: "/textAnnotation",
-        query:{
+        query: {
             pID,
             tID,
-        }
+        },
     })
 }
 //删除项目
@@ -329,13 +338,12 @@ const deleteFile = (index: number) => {
         max-height: calc(100vh - 100px);
         overflow: hidden;
         padding: 20px;
-        :deep(.el-table__expanded-cell){
-          background: #fafafa;
-          padding: 0;
+        :deep(.el-table__expanded-cell) {
+            background: #fafafa;
+            padding: 0;
         }
         .task-detail {
             height: 300px;
-            
         }
     }
 }
