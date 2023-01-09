@@ -101,11 +101,17 @@
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
                     <template #default="scope">
-                        <el-button
-                            type="primary"
-                            :icon="Edit"
-                            @click="toTextAnnotation(Number(scope.$index))"
-                        />
+                        <el-tooltip
+                            effect="dark"
+                            content="标注"
+                            placement="top"
+                        >
+                            <el-button
+                                type="primary"
+                                :icon="Edit"
+                                @click="toTextAnnotation(Number(scope.$index))"
+                            />
+                        </el-tooltip>
                         <el-popover
                             placement="top-start"
                             title="删除该文件及其标注"
