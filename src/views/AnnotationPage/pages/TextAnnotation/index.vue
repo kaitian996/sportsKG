@@ -121,7 +121,9 @@
                             class="tag-item"
                             :style="`--color:green`"
                             @click="currentSelectLabel = String(item.text)"
-                            v-for="item in computedAnnotationTags.autoKey"
+                            v-for="(
+                                item, index
+                            ) in computedAnnotationTags.autoKey"
                         >
                             <div
                                 class="tag-head"
@@ -132,7 +134,9 @@
                                 :style="`--color:#00800026`"
                             >
                                 <span class="tag-text">{{ item.text }}</span>
-                                <span class="tag-hotkey">1</span>
+                                <span class="tag-hotkey">{{
+                                    keyboardMap["autoKey"][index].ref
+                                }}</span>
                             </div>
                         </div>
                     </div>
@@ -142,7 +146,9 @@
                             class="tag-item"
                             :style="`--color:${item.color}`"
                             @click="currentSelectLabel = Number(item.id)"
-                            v-for="item in computedAnnotationTags.labelCategories"
+                            v-for="(
+                                item, index
+                            ) in computedAnnotationTags.labelCategories"
                         >
                             <div
                                 class="tag-head"
@@ -153,7 +159,9 @@
                                 :style="`--color:${item.color + 26}`"
                             >
                                 <span class="tag-text">{{ item.text }}</span>
-                                <span class="tag-hotkey">1</span>
+                                <span class="tag-hotkey">{{
+                                    keyboardMap["signalKey"][index].ref
+                                }}</span>
                             </div>
                         </div>
                     </div>
@@ -163,7 +171,9 @@
                             class="tag-item"
                             :style="`--color:orange`"
                             @click="currentSelectConnection = Number(item.id)"
-                            v-for="item in computedAnnotationTags.connectionCategories"
+                            v-for="(
+                                item, index
+                            ) in computedAnnotationTags.connectionCategories"
                         >
                             <div
                                 class="tag-head"
@@ -174,7 +184,9 @@
                                 :style="`--color:#ffa50026`"
                             >
                                 <span class="tag-text">{{ item.text }}</span>
-                                <span class="tag-hotkey">1</span>
+                                <span class="tag-hotkey">{{
+                                    keyboardMap["connectKey"][index].ref
+                                }}</span>
                             </div>
                         </div>
                     </div>
@@ -277,6 +289,7 @@ import { Annotator, Action } from "poplar-annotation"
 import { useCreateAnnotationData } from "@/hooks/useCreateAnnotationData"
 import { ElMessage } from "element-plus"
 import { useElementResize, useWindowResize } from "@/hooks/useWindowResize"
+import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
 //路由参数
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
@@ -293,6 +306,39 @@ const computedAnnotationTags = computed(() => {
         labelCategories: currentProject.labelCategories,
         connectionCategories: currentProject.connectionCategories,
     }
+})
+//增加标注功能
+const keyboardMap = {
+    autoKey: useKeyToKeyboard(computedAnnotationTags.value.autoKey!, "autoKey"),
+    signalKey: useKeyToKeyboard(
+        computedAnnotationTags.value.labelCategories,
+        "signalKey"
+    ),
+    connectKey: useKeyToKeyboard(
+        computedAnnotationTags.value.connectionCategories,
+        "connectKey"
+    ),
+}
+onMounted(() => {
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
+        const key = e.key
+        const autokey = keyboardMap.autoKey.find((item) => item.ref === key)
+        if (autokey) {
+            currentSelectLabel.value = autokey.value
+            return
+        }
+        const signalkey = keyboardMap.signalKey.find((item) => item.ref === key)
+        if (signalkey) {
+            currentSelectLabel.value = signalkey.value
+            return
+        }
+        const connectkey = keyboardMap.connectKey.find(
+            (item) => item.ref === key
+        )
+        if (connectkey) {
+            currentSelectConnection.value = connectkey.value as number
+        }
+    })
 })
 //标注功能
 const annotationContainer = ref<HTMLElement>()
