@@ -365,6 +365,7 @@
                             <div class="view-tags" v-if="areaIndex === 0">
                                 <div
                                     class="tag-item"
+                                    :style="`--color:${item.color}`"
                                     v-for="(
                                         item, index
                                     ) in computedAnnotationData.labelCategories"
@@ -390,6 +391,7 @@
                             <div class="view-tags" v-if="areaIndex === 1">
                                 <div
                                     class="tag-item"
+                                    :style="`--color:orange`"
                                     v-for="(
                                         item, index
                                     ) in computedAnnotationData.connectionCategories"
@@ -397,11 +399,11 @@
                                 >
                                     <div
                                         class="tag-head"
-                                        :style="`--color:#95e1d3`"
+                                        :style="`--color:orange`"
                                     ></div>
                                     <div
                                         class="tag-content"
-                                        :style="`--color:#95e1d326`"
+                                        :style="`--color:#ffa50026`"
                                     >
                                         <span class="tag-text">{{
                                             item.text
@@ -1286,6 +1288,10 @@ const saveProject = () => {
                         margin-right: 5px;
                         margin-bottom: 5px;
                         cursor: pointer;
+                        &:hover {
+                            background: var(--color);
+                            border-radius: 4px;
+                        }
                         .tag-head {
                             width: 3px;
                             background: var(--color);

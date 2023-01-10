@@ -589,7 +589,6 @@ watch([leftOpen, rightOpen], () => {
         .annotator-area {
             flex: 1;
             height: calc(100vh - 50px);
-            overflow: auto;
             margin: 0 25px;
             .tags-box-area {
                 min-height: 100px;
@@ -599,8 +598,6 @@ watch([leftOpen, rightOpen], () => {
                 .view-tags {
                     display: flex;
                     flex-wrap: wrap;
-                    max-height: 100px;
-                    overflow: auto;
                     margin: 15px 0;
                     .tag-item {
                         border-radius: 3px;
@@ -609,6 +606,7 @@ watch([leftOpen, rightOpen], () => {
                         cursor: pointer;
                         &:hover {
                             background: var(--color);
+                            border-radius: 4px;
                         }
                         .tag-head {
                             width: 3px;

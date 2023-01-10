@@ -444,6 +444,7 @@
                                 >
                                     <div
                                         class="tag-item"
+                                        :style="`--color:green`"
                                         v-for="(
                                             item, index
                                         ) in computedAnnotationData.autoKey"
@@ -451,11 +452,11 @@
                                     >
                                         <div
                                             class="tag-head"
-                                            :style="`--color:#95e1d3`"
+                                            :style="`--color:green`"
                                         ></div>
                                         <div
                                             class="tag-content"
-                                            :style="`--color:#95e1d326`"
+                                            :style="`--color:#00800026`"
                                         >
                                             <span class="tag-text">{{
                                                 item.text
@@ -474,6 +475,7 @@
                                 <div class="view-tags" v-if="areaIndex === 0">
                                     <div
                                         class="tag-item"
+                                        :style="`--color:${item.color}`"
                                         v-for="(
                                             item, index
                                         ) in computedAnnotationData.labelCategories"
@@ -502,6 +504,7 @@
                                 <div class="view-tags" v-if="areaIndex === 1">
                                     <div
                                         class="tag-item"
+                                        :style="`--color:orange`"
                                         v-for="(
                                             item, index
                                         ) in computedAnnotationData.connectionCategories"
@@ -511,11 +514,11 @@
                                     >
                                         <div
                                             class="tag-head"
-                                            :style="`--color:#95e1d3`"
+                                            :style="`--color:orange`"
                                         ></div>
                                         <div
                                             class="tag-content"
-                                            :style="`--color:#95e1d326`"
+                                            :style="`--color:#ffa50026`"
                                         >
                                             <span class="tag-text">{{
                                                 item.text
@@ -1475,7 +1478,7 @@ const removeProject = () => {
                         font-weight: 500;
                     }
                     .ui-view {
-                        .view-tags-box{
+                        .view-tags-box {
                             max-height: 200px;
                             overflow: auto;
                             .view-tags {
@@ -1486,6 +1489,10 @@ const removeProject = () => {
                                     margin-right: 5px;
                                     margin-bottom: 5px;
                                     cursor: pointer;
+                                    &:hover {
+                                        background: var(--color);
+                                        border-radius: 4px;
+                                    }
                                     .tag-head {
                                         width: 3px;
                                         background: var(--color);
@@ -1495,7 +1502,7 @@ const removeProject = () => {
                                         background: var(--color);
                                         padding: 0 5px;
                                         border-radius: 0 4px 4px 0;
-    
+
                                         .tag-text {
                                             margin-right: 5px;
                                         }
