@@ -112,6 +112,17 @@
                                 @click="toTextAnnotation(Number(scope.$index))"
                             />
                         </el-tooltip>
+                        <el-tooltip
+                            effect="dark"
+                            content="数据导出"
+                            placement="top"
+                        >
+                            <el-button
+                                type="success"
+                                :icon="Upload"
+                                @click="openDownloaderDig(scope.$index)"
+                            />
+                        </el-tooltip>
                         <el-popover
                             placement="top-start"
                             title="删除该文件及其标注"
@@ -223,6 +234,171 @@
             </div>
         </el-dialog>
     </div>
+    <!-- 数据导出 -->
+    <div class="data-downloader">
+        <el-dialog
+            v-model="openDownloader"
+            :close-on-click-modal="true"
+            :show-close="false"
+            width="40%"
+            top="40px"
+        >
+            <template #header="{ close, titleId, titleClass }">
+                <div class="step-warpper">
+                    <div class="left-title">数据导出</div>
+                    <div class="step-content">
+                        <div class="step-item item-active">数据导出</div>
+                    </div>
+                    <div class="right-button">
+                        <el-button @click="closeDownloader(close)"
+                            >取消</el-button
+                        >
+                        <el-button type="primary" @click="toDownloadTheFile"
+                            >确定</el-button
+                        >
+                    </div>
+                </div>
+            </template>
+            <div class="content-wapper">
+                <el-form
+                    label-width="120px"
+                    label-position="left"
+                    :model="outputOptions"
+                    class="output-form"
+                    ref="outputForm"
+                >
+                    <!-- 导出名称 -->
+                    <el-form-item label="导出文件名称" class="output-form-item">
+                        <el-input v-model="outputOptions.fileName" />
+                    </el-form-item>
+                    <!-- 导出类型 -->
+                    <el-space fill class="output-form-item">
+                        <el-alert type="info" show-icon :closable="false">
+                            <p v-if="outputOptions.type === 'label'">
+                                导出标注的实体数据
+                            </p>
+                            <p v-if="outputOptions.type === 'connection'">
+                                导出标注的三元组数据
+                            </p>
+                            <p v-if="outputOptions.type === 'all'">
+                                导出所有的文本数据，其中会对未标注的文本进行自动标注
+                            </p>
+                        </el-alert>
+                        <el-form-item label="导出类型">
+                            <el-select
+                                placeholder="选择导出类型"
+                                v-model="outputOptions.type"
+                            >
+                                <el-option
+                                    label="Labels 数据导出"
+                                    value="label"
+                                />
+                                <el-option
+                                    label="Connections 数据导出"
+                                    value="connection"
+                                />
+                                <el-option label="全文数据导出" value="all" />
+                            </el-select>
+                        </el-form-item>
+                    </el-space>
+                    <!-- labels 数据导出 -->
+                    <div v-if="outputOptions.type === 'label'">
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p>
+                                    导出数据的的每一行的格式:支持自定义，提供三个数据项：索引：${index}、标签：${label}、实体：${entity}
+                                </p>
+                                <p>
+                                    例如：
+                                    <br />
+                                    输入格式：${index} - ${label} - ${entity}
+                                    <br />
+                                    输出结果：0 - B-LOC - 北京
+                                </p>
+                            </el-alert>
+                            <el-form-item label="导出格式">
+                                <el-input
+                                    v-model="outputOptions.label.format"
+                                />
+                            </el-form-item>
+                        </el-space>
+                    </div>
+                    <!-- connection 数据导出 -->
+                    <div v-if="outputOptions.type === 'connection'">
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p>
+                                    导出数据的的每一行的格式:支持自定义
+                                    <br />
+                                    提供四个数据项：
+                                    <br />
+                                    索引：${index}、起始实体：${startEntity}、起始实体标签：${startLabel}
+                                    <br />
+                                    关系：${connection}、
+                                    <br />
+                                    终止实体：${endEntity}、起始实体标签：${endLabel}
+                                </p>
+                                <p>
+                                    例如：
+                                    <br />
+                                    输入格式：${index} - ${startEntity} -
+                                    ${connection} - ${endEntity}
+                                    <br />
+                                    输出结果：0 - 北京 - 首都 - 中国
+                                </p>
+                            </el-alert>
+                            <el-form-item label="导出格式">
+                                <el-input
+                                    v-model="outputOptions.connection.format"
+                                />
+                            </el-form-item>
+                        </el-space>
+                    </div>
+                    <!-- all 全文数据导出 -->
+                    <div v-if="outputOptions.type === 'all'">
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p>
+                                    导出数据的的每一行的格式:支持自定义，提供三个数据项：索引：${index}、标签：${label}、实体：${entity}
+                                </p>
+                                <p>
+                                    例如：
+                                    <br />
+                                    输入格式：${index} - ${label} - ${entity}
+                                    <br />
+                                    输出结果：0 - B-LOC - 北京
+                                </p>
+                            </el-alert>
+                            <el-form-item label="导出格式">
+                                <el-input v-model="outputOptions.all.format" />
+                            </el-form-item>
+                        </el-space>
+                        <!-- 自动补全标签 -->
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p>
+                                    选择自动标注的标签，会在数据导出时自动对未标注的数据逐一标注
+                                </p>
+                            </el-alert>
+                            <el-form-item label="自动标注">
+                                <el-select
+                                    placeholder="选择自动标注"
+                                    v-model="outputOptions.all.autoFill"
+                                    value-key="id"
+                                >
+                                    <el-option
+                                        v-for="item in currentProject.labelCategories"
+                                        :label="item.text"
+                                        :value="item"
+                                    />
+                                </el-select>
+                            </el-form-item>
+                        </el-space>
+                    </div>
+                </el-form>
+            </div>
+        </el-dialog>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -232,10 +408,23 @@ import {
     annotationDataType,
     annotationProjectStore,
 } from "@/store/annotationProject"
-import { ArrowRight, Edit, Delete, UploadFilled } from "@element-plus/icons-vue"
+import {
+    ArrowRight,
+    Edit,
+    Delete,
+    UploadFilled,
+    Upload,
+} from "@element-plus/icons-vue"
 import { useFileReader } from "@/hooks/useFileReader"
-import { ElMessage, ElNotification, UploadFile } from "element-plus"
+import {
+    ElMessage,
+    ElNotification,
+    UploadFile,
+    FormInstance,
+} from "element-plus"
 import { connections, labels } from "@/hooks/useCreateAnnotationData"
+import { fa } from "element-plus/lib/locale"
+import { useDownload } from "@/hooks/useDownload"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const currentProject = useProjection.annotationProject[pID]
@@ -304,7 +493,7 @@ const setState = (index: string, state: string) => {
     currentProject.data[Number(index)].state = state
     stateRef.value = -1
 }
-//去标注项目
+//去标注文件
 const toTextAnnotation = (tID: number) => {
     if (currentProject.labelCategories.length === 0) {
         return ElMessage.error(
@@ -319,11 +508,86 @@ const toTextAnnotation = (tID: number) => {
         },
     })
 }
-//删除项目
+//删除文件
 const deleteRef = ref(-1)
 const deleteFile = (index: number) => {
     currentProject.data.splice(index, 1)
     deleteRef.value = -1
+}
+//数据导出
+const openDownloader = ref(false)
+const outputOptions = reactive({
+    pID: pID,
+    tID: 0,
+    fileName: "",
+    type: "label",
+    label: {
+        format: "${label} ${entity}",
+    },
+    connection: {
+        format: "${startEntity} ${connection} ${endEntity}",
+    },
+    all: {
+        format: "${label} ${entity}",
+        autoFill: null,
+    },
+})
+const openDownloaderDig = (index: number) => {
+    outputOptions.tID = index
+    outputOptions.fileName = currentProject.data[index].fileName + "-do"
+    openDownloader.value = true
+}
+const outputForm = ref<FormInstance>()
+const closeDownloader = (close: Function) => {
+    close()
+    outputOptions.type = "label"
+    outputOptions.label.format = "${label} ${entity}"
+    outputOptions.connection.format =
+        "${startEntity} ${connection} ${endEntity}"
+    outputOptions.all.format = "${label} ${entity}"
+    outputOptions.all.autoFill = null
+}
+const toDownloadTheFile = () => {
+    if (!outputOptions.fileName) {
+        return ElMessage.error("请填写导出文件名称！")
+    }
+    const output: any = {
+        pID: pID,
+        tID: outputOptions.tID,
+        fileName: outputOptions.fileName,
+        type: outputOptions.type,
+    }
+    switch (outputOptions.type) {
+        case "label":
+            if (!outputOptions.label.format) {
+                return ElMessage.error("请填写正确导出格式!")
+            }
+            output.label = {
+                format: "`" + outputOptions.label.format + "\n`",
+            }
+            break
+        case "connection":
+            if (!outputOptions.connection.format) {
+                return ElMessage.error("请填写正确导出格式!")
+            }
+            output.connection = {
+                format: "`" + outputOptions.connection.format + "\n`",
+            }
+            break
+        case "all":
+            if (!outputOptions.all.format) {
+                return ElMessage.error("请填写正确导出格式!")
+            }
+            output.all = {
+                format: "`" + outputOptions.all.format + "\n`",
+                autoFill: outputOptions.all.autoFill,
+            }
+            break
+    }
+    console.log(output)
+    useDownload(output)
+    //导出数据
+    closeDownloader(() => (openDownloader.value = false))
 }
 </script>
 
@@ -432,6 +696,78 @@ const deleteFile = (index: number) => {
                 width: 100%;
             }
         }
+    }
+}
+.data-downloader {
+    ::v-deep .el-dialog {
+        margin-bottom: 0;
+        border-radius: 10px;
+        .el-dialog__header {
+            padding: 0;
+            margin-right: 0;
+        }
+        .el-dialog__body {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }
+    .step-warpper {
+        display: flex;
+        align-items: center;
+        border-bottom: solid 1px #dcdfe6;
+        justify-content: space-between;
+        box-sizing: content-box;
+        min-height: 40px;
+        padding: 16px 40px;
+        cursor: pointer;
+        .left-title {
+            font-size: 20px;
+            margin-bottom: 0;
+            font-weight: 500;
+            margin-top: 0;
+            width: 20%;
+        }
+        .step-content {
+            width: 40%;
+            height: 34px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            box-shadow: inset 0 1px 0 rgb(0 0 0 / 5%),
+                inset 0 0 0 1px rgb(0 0 0 / 5%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            .step-item {
+                flex: 1;
+                text-align: center;
+                margin: 0 5px;
+                border-radius: 4px;
+                padding: 2px 16px;
+                color: rgba(0, 0, 0, 0.6);
+                max-width: 30%;
+            }
+            .item-active {
+                background: #fff;
+                box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 2%),
+                    0 5px 10px rgb(0 0 0 / 15%);
+                color: #000;
+            }
+        }
+        .right-button {
+            width: 20%;
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+    .content-wapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        height: 70vh;
+        overflow: auto;
+        padding: 30px 0;
     }
 }
 </style>
