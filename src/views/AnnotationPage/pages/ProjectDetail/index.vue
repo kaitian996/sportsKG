@@ -233,7 +233,7 @@ import {
     annotationProjectStore,
 } from "@/store/annotationProject"
 import { ArrowRight, Edit, Delete, UploadFilled } from "@element-plus/icons-vue"
-import { useFileReader } from "@/hooks/useFileReader "
+import { useFileReader } from "@/hooks/useFileReader"
 import { ElMessage, ElNotification, UploadFile } from "element-plus"
 import { connections, labels } from "@/hooks/useCreateAnnotationData"
 const useProjection = annotationProjectStore()

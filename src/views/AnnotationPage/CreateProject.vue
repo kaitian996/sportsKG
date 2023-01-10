@@ -560,7 +560,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useFileReader } from "@/hooks/useFileReader "
+import { useFileReader } from "@/hooks/useFileReader"
 import {
     UploadFilled,
     Back,
