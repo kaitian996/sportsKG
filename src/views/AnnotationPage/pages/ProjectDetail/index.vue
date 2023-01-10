@@ -153,7 +153,47 @@
                 </el-table-column>
                 <el-table-column type="expand" width="100">
                     <template #default="props">
-                        <div class="task-detail"></div>
+                        <div class="task-detail">
+                            <!-- 数据 -->
+                            <div class="task-data">
+                                <p class="task-data-item">
+                                    文件名称：{{ props.row.fileName }}
+                                </p>
+                                <p class="task-data-item">
+                                    状态：{{ state[props.row.state].info }}
+                                </p>
+                                <p class="task-data-item">
+                                    实体数：{{ currentProject.data[props.$index].labels.length }}
+                                </p>
+                                <p class="task-data-item">
+                                    三元组数：{{  currentProject.data[props.$index].connections.length }}
+                                </p>
+                                <p class="task-data-item">
+                                    创建日期：{{ `2022-1-6` }}
+                                </p>
+                                <p class="task-data-item">
+                                    修改日期：{{ `2022-1-6` }}
+                                </p>
+                            </div>
+                            <!-- label图 -->
+                            <div class="task-label-chart">
+                                <SimplePie
+                                    :seriesData="
+                                        getComputedLabelCount(props.$index)
+                                    "
+                                    title="实体标注饼图"
+                                ></SimplePie>
+                            </div>
+                            <!-- 三元组图 -->
+                            <div class="task-connection-cahrt">
+                                <SimplePie
+                                    title="关系标注饼图"
+                                    :seriesData="
+                                        getComputedConnectionCount(props.$index)
+                                    "
+                                ></SimplePie>
+                            </div>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -423,7 +463,7 @@ import {
     FormInstance,
 } from "element-plus"
 import { connections, labels } from "@/hooks/useCreateAnnotationData"
-import { fa } from "element-plus/lib/locale"
+import SimplePie from "@/components/StdChart/SimplePie.vue"
 import { useDownload } from "@/hooks/useDownload"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
@@ -589,6 +629,100 @@ const toDownloadTheFile = () => {
     //导出数据
     closeDownloader(() => (openDownloader.value = false))
 }
+//文件细节
+const computedChartData = computed(() => {
+    return {
+        labelChartData: [
+            {
+                value: 1,
+                name: "label",
+            },
+            {
+                value: 2,
+                name: "label1",
+            },
+            {
+                value: 3,
+                name: "label3",
+            },
+            {
+                value: 1,
+                name: "label23",
+            },
+            {
+                value: 2,
+                name: "label1dw",
+            },
+            {
+                value: 3,
+                name: "label3aa",
+            },
+            {
+                value: 1,
+                name: "labelcs",
+            },
+            {
+                value: 2,
+                name: "label1sxs",
+            },
+            {
+                value: 3,
+                name: "label3vd",
+            },
+            {
+                value: 1,
+                name: "labelbftg",
+            },
+            {
+                value: 2,
+                name: "label1dvcs",
+            },
+            {
+                value: 3,
+                name: "label3adss",
+            },
+            {
+                value: 1,
+                name: "labelkmyh",
+            },
+            {
+                value: 2,
+                name: "label1ol,",
+            },
+            {
+                value: 3,
+                name: "label3iujh",
+            },
+        ],
+        connectionChartData: [],
+    }
+})
+const getComputedLabelCount = (tID: number) => {
+    const labelCount: { name: string; value: number }[] = []
+    currentProject.labelCategories.forEach((labelCategory) => {
+        const { id, text } = labelCategory
+        const value = currentProject.data[tID].labels.filter(
+            (label) => label.categoryId === id
+        ).length
+        if (value > 0) {
+            labelCount.push({ name: text, value })
+        }
+    })
+    return labelCount
+}
+const getComputedConnectionCount = (tID: number) => {
+    const connectionCount: { name: string; value: number }[] = []
+    currentProject.connectionCategories.forEach((connectionCategory) => {
+        const { id, text } = connectionCategory
+        const value = currentProject.data[tID].connections.filter(
+            (connection) => connection.categoryId === id
+        ).length
+        if (value > 0) {
+            connectionCount.push({ name: text, value })
+        }
+    })
+    return connectionCount
+}
 </script>
 
 <style scoped lang="less">
@@ -614,6 +748,29 @@ const toDownloadTheFile = () => {
         }
         .task-detail {
             height: 300px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            .task-data {
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                width: 30%;
+                padding-top: 30px;
+                .task-data-item {
+                    padding: 0 100px;
+                    margin: 20px 0 0 0;
+                    font-size: 14px;
+                    font-weight: 500;
+                }
+            }
+            .task-label-chart,
+            .task-connection-cahrt {
+                box-sizing: border-box;
+                padding: 20px 0 0 0;
+                width: 40%;
+                height: 100%;
+            }
         }
     }
 }

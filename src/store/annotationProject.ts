@@ -39,5 +39,5 @@ export const annotationProjectStore = defineStore("annotationProjectStore", {
             this.annotationProject.push(projectData)
         },
     },
-    persist: true
+    persist: true,
 })

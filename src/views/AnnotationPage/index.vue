@@ -219,12 +219,12 @@ const toSetting = (index: number) => {
     padding: 2% 4%;
     flex-wrap: wrap;
     margin: 0 auto;
-
+    max-height: calc(100% - 50px);
+    overflow: auto;
     .project-item {
         margin: 1% 1%;
         height: 150px;
         width: 300px;
-        border: 1px solid #dcdfe6;
         border-radius: 3px;
         transition: all 0.3s ease-in-out;
         background: #fff;
