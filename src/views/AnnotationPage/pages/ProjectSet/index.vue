@@ -732,7 +732,7 @@ import {
     useCreateAnnotationData,
 } from "@/hooks/useCreateAnnotationData"
 import { Annotator, Action } from "poplar-annotation"
-import { ElMessage, ElNotification } from "element-plus"
+import { ElMessage, ElMessageBox, ElNotification } from "element-plus"
 import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
@@ -780,6 +780,66 @@ const removeLabel = (index: number) => {
      * 2、将auto与这个有关的id删除
      * 3、将connect与这个有关的id删除
      */
+    ElMessageBox.confirm(
+        "删除已有标签会同时删除与该标签有关的标注、三元组、自动补全标签,且无法恢复",
+        "警告",
+        {
+            confirmButtonText: "确认删除",
+            cancelButtonText: "取消",
+            type: "warning",
+            autofocus: false,
+        }
+    )
+        .then(() => {
+            const deleteTarget = currentProject.labelCategories[index].id
+            const data = currentProject.data
+            let count = 0
+            //循环删除data中有关数据:label 和
+            data.forEach((item) => {
+                for (let i = 0; i < item.labels.length; i++) {
+                    const label = item.labels[i]
+                    if (label.categoryId === deleteTarget) {
+                        item.labels.splice(i--, 1)
+                        count++
+                    }
+                }
+                //删除connection
+                for (let i = 0; i < item.connections.length; i++) {
+                    const connection = item.connections[i]
+                    if (
+                        connection.fromId === deleteTarget ||
+                        connection.fromId === deleteTarget
+                    ) {
+                        item.connections.splice(i--, 1)
+                        count++
+                    }
+                }
+            })
+            //删除autokey
+            for (let i = 0; i < currentProject.autoKey!.length; i++) {
+                const autokey = currentProject.autoKey![i]
+                if (
+                    autokey.begin === deleteTarget ||
+                    autokey.inner === deleteTarget ||
+                    autokey.end === deleteTarget
+                ) {
+                    currentProject.autoKey?.splice(i--, 1)
+                    count++
+                }
+            }
+            // 再删除这个标签
+            currentProject.labelCategories.splice(index, 1)
+            ElMessage({
+                type: "success",
+                message: `已全部删除,影响条目 ${count}`,
+            })
+        })
+        .catch(() => {
+            ElMessage({
+                type: "info",
+                message: "已取消删除",
+            })
+        })
 }
 const setLabelColor = (className: string) => {
     const input = document.querySelector(`.${className}`) as HTMLInputElement
@@ -811,6 +871,44 @@ const removeConnection = (index: number) => {
      * 1、找到index所代表的id
      * 2、删除对应的connect的对象
      */
+    ElMessageBox.confirm(
+        "删除已有关系会同时删除与该关系有关的三元组，且无法恢复",
+        "警告",
+        {
+            confirmButtonText: "确认删除",
+            cancelButtonText: "取消",
+            type: "warning",
+            autofocus: false,
+        }
+    )
+        .then(() => {
+            const deleteTarget = currentProject.connectionCategories[index].id
+            const data = currentProject.data
+            let count = 0
+            //循环删除data中有关数据:connection
+            data.forEach((item) => {
+                //删除connection
+                for (let i = 0; i < item.connections.length; i++) {
+                    const connection = item.connections[i]
+                    if (connection.categoryId === deleteTarget) {
+                        item.connections.splice(i--, 1)
+                        count++
+                    }
+                }
+            })
+            // 再删除这个标签
+            currentProject.connectionCategories.splice(index, 1)
+            ElMessage({
+                type: "success",
+                message: `已全部删除,影响条目 ${count}`,
+            })
+        })
+        .catch(() => {
+            ElMessage({
+                type: "info",
+                message: "已取消删除",
+            })
+        })
 }
 //autoKey 自动补全
 const openAutoKey = ref(false)
