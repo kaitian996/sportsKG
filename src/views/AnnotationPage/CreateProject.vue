@@ -365,7 +365,9 @@
                             <div class="view-tags" v-if="areaIndex === 0">
                                 <div
                                     class="tag-item"
-                                    v-for="item in computedAnnotationData.labelCategories"
+                                    v-for="(
+                                        item, index
+                                    ) in computedAnnotationData.labelCategories"
                                     @click="currentSelectLabel = item.id!"
                                 >
                                     <div
@@ -379,14 +381,18 @@
                                         <span class="tag-text">{{
                                             item.text
                                         }}</span>
-                                        <span class="tag-hotkey">1</span>
+                                        <span class="tag-hotkey">{{
+                                            keyboardMap["signalKey"][index].ref
+                                        }}</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="view-tags" v-if="areaIndex === 1">
                                 <div
                                     class="tag-item"
-                                    v-for="item in computedAnnotationData.connectionCategories"
+                                    v-for="(
+                                        item, index
+                                    ) in computedAnnotationData.connectionCategories"
                                     @click="currentSelectConnection = item.id!"
                                 >
                                     <div
@@ -400,7 +406,9 @@
                                         <span class="tag-text">{{
                                             item.text
                                         }}</span>
-                                        <span class="tag-hotkey">1</span>
+                                        <span class="tag-hotkey">{{
+                                            keyboardMap["connectKey"][index].ref
+                                        }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -591,6 +599,7 @@ import {
     connectionCategories,
 } from "@/hooks/useCreateAnnotationData"
 import { Annotator, Action } from "poplar-annotation"
+import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
 
 const openDialog = inject("openDialog") as Ref<boolean>
 const activeStep = ref<number>(0)
@@ -804,6 +813,41 @@ const computedAnnotationData = computed(() => {
         []
     )
 })
+//键盘热键
+//增加标注功能
+const keyboardMap = computed(() => {
+    return {
+        signalKey: useKeyToKeyboard(
+            computedAnnotationData.value.labelCategories,
+            "signalKey"
+        ),
+        connectKey: useKeyToKeyboard(
+            computedAnnotationData.value.connectionCategories,
+            "connectKey"
+        ),
+    }
+})
+
+onMounted(() => {
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
+        if (activeStep.value !== 2) return
+        const key = e.key
+
+        const signalkey = keyboardMap.value.signalKey.find(
+            (item) => item.ref === key
+        )
+        if (signalkey) {
+            currentSelectLabel.value = signalkey.value as number
+            return
+        }
+        const connectkey = keyboardMap.value.connectKey.find(
+            (item) => item.ref === key
+        )
+        if (connectkey) {
+            currentSelectConnection.value = connectkey.value as number
+        }
+    })
+})
 const annotationContainer = ref<HTMLElement>()
 let annotator: Annotator
 const textSelector = reactive({
@@ -956,7 +1000,7 @@ const saveProject = () => {
                 }
             }
         ),
-        autoKey:[]
+        autoKey: [],
     })
     ;(openDialog as Ref<boolean>).value = false
     ElNotification.success({
@@ -1207,7 +1251,7 @@ const saveProject = () => {
                                     padding: 2px 6px;
 
                                     // width: 10px;
-                                   
+
                                     &:hover {
                                         background: rgba(255, 0, 0, 0.133);
                                     }
