@@ -603,7 +603,7 @@ const toDownloadTheFile = () => {
                 return ElMessage.error("请填写正确导出格式!")
             }
             output.label = {
-                format: "`" + outputOptions.label.format + "\n`",
+                format: "`" + outputOptions.label.format + "`",
             }
             break
         case "connection":
@@ -611,7 +611,7 @@ const toDownloadTheFile = () => {
                 return ElMessage.error("请填写正确导出格式!")
             }
             output.connection = {
-                format: "`" + outputOptions.connection.format + "\n`",
+                format: "`" + outputOptions.connection.format + "`",
             }
             break
         case "all":
@@ -619,7 +619,7 @@ const toDownloadTheFile = () => {
                 return ElMessage.error("请填写正确导出格式!")
             }
             output.all = {
-                format: "`" + outputOptions.all.format + "\n`",
+                format: "`" + outputOptions.all.format + "`",
                 autoFill: outputOptions.all.autoFill,
             }
             break
@@ -630,73 +630,6 @@ const toDownloadTheFile = () => {
     closeDownloader(() => (openDownloader.value = false))
 }
 //文件细节
-const computedChartData = computed(() => {
-    return {
-        labelChartData: [
-            {
-                value: 1,
-                name: "label",
-            },
-            {
-                value: 2,
-                name: "label1",
-            },
-            {
-                value: 3,
-                name: "label3",
-            },
-            {
-                value: 1,
-                name: "label23",
-            },
-            {
-                value: 2,
-                name: "label1dw",
-            },
-            {
-                value: 3,
-                name: "label3aa",
-            },
-            {
-                value: 1,
-                name: "labelcs",
-            },
-            {
-                value: 2,
-                name: "label1sxs",
-            },
-            {
-                value: 3,
-                name: "label3vd",
-            },
-            {
-                value: 1,
-                name: "labelbftg",
-            },
-            {
-                value: 2,
-                name: "label1dvcs",
-            },
-            {
-                value: 3,
-                name: "label3adss",
-            },
-            {
-                value: 1,
-                name: "labelkmyh",
-            },
-            {
-                value: 2,
-                name: "label1ol,",
-            },
-            {
-                value: 3,
-                name: "label3iujh",
-            },
-        ],
-        connectionChartData: [],
-    }
-})
 const getComputedLabelCount = (tID: number) => {
     const labelCount: { name: string; value: number }[] = []
     currentProject.labelCategories.forEach((labelCategory) => {

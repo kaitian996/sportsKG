@@ -48,7 +48,10 @@ export const useDownload = (options: DownloadOptions) => {
                 annotationData.labels[i].startIndex,
                 annotationData.labels[i].endIndex
             )
-            const line = eval(format)
+            let line = eval(format)
+            if (!line.endsWith("\n")) {
+                line = line + "\n"
+            }
             lineContent.push(line)
         }
     } else if (type === "connection") {
@@ -89,7 +92,11 @@ export const useDownload = (options: DownloadOptions) => {
             const connection = annotationData.connectionCategories.find(
                 (item) => item.id === annotationData.connections[i].categoryId
             )?.text
-            const line = eval(format)
+
+            let line = eval(format)
+            if (!line.endsWith("\n")) {
+                line = line + "\n"
+            }
             lineContent.push(line)
         }
     } else if (type === "all") {
@@ -129,7 +136,10 @@ export const useDownload = (options: DownloadOptions) => {
                     allLabels[i].startIndex,
                     allLabels[i].endIndex
                 )
-                const line = eval(format)
+                let line = eval(format)
+                if (!line.endsWith("\n")) {
+                    line = line + "\n"
+                }
                 lineContent.push(line)
             }
         } else {
@@ -144,10 +154,15 @@ export const useDownload = (options: DownloadOptions) => {
                     annotationData.labels[i].startIndex,
                     annotationData.labels[i].endIndex
                 )
-                const line = eval(format)
+                let line = eval(format)
+                if (!line.endsWith("\n")) {
+                    line = line + "\n"
+                }
                 lineContent.push(line)
             }
         }
+        console.log(lineContent);
+        
     }
     //下载
     const blob = new Blob(lineContent, { type: "text/plain,charset=UTF-8" })
