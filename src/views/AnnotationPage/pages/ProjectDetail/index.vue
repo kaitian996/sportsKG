@@ -163,16 +163,28 @@
                                     状态：{{ state[props.row.state].info }}
                                 </p>
                                 <p class="task-data-item">
-                                    实体数：{{ currentProject.data[props.$index].labels.length }}
+                                    实体数：{{
+                                        currentProject.data[props.$index].labels
+                                            .length
+                                    }}
                                 </p>
                                 <p class="task-data-item">
-                                    三元组数：{{  currentProject.data[props.$index].connections.length }}
+                                    三元组数：{{
+                                        currentProject.data[props.$index]
+                                            .connections.length
+                                    }}
                                 </p>
                                 <p class="task-data-item">
-                                    创建日期：{{ `2022-1-6` }}
+                                    创建日期：{{
+                                        currentProject.data[props.$index]
+                                            .createDate
+                                    }}
                                 </p>
                                 <p class="task-data-item">
-                                    修改日期：{{ `2022-1-6` }}
+                                    修改日期：{{
+                                        currentProject.data[props.$index]
+                                            .changeDate
+                                    }}
                                 </p>
                             </div>
                             <!-- label图 -->
@@ -488,6 +500,8 @@ const uploadFlieList = ref<
         labels: labels[]
         connections: connections[]
         state: string
+        createDate: string
+        changeDate: string
     }[]
 >([])
 const loadTextFromFile = (uploadFile: UploadFile) => {
@@ -495,15 +509,21 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
     const file = uploadFile.raw
     if (!file) return
     setImmediate(() => {
-        useFileReader(file, (r: string) =>
+        useFileReader(file, (r: string) => {
+            const nowDate = new Date()
+            const date = `${nowDate.getFullYear()}-${
+                nowDate.getMonth() + 1
+            }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
             uploadFlieList.value.push({
                 fileName: file.name,
                 fileContent: r,
                 labels: [],
                 connections: [],
                 state: "pending",
+                createDate: date,
+                changeDate: date,
             })
-        )
+        })
     })
 }
 const handleFileDelete = (index: number) => {

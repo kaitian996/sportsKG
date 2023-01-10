@@ -778,15 +778,21 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
     const file = uploadFile.raw
     if (!file) return
     setImmediate(() => {
-        useFileReader(file, (r: string) =>
+        useFileReader(file, (r: string) => {
+            const nowDate = new Date()
+            const date = `${nowDate.getFullYear()}-${
+                nowDate.getMonth() + 1
+            }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
             projectData.data.push({
                 fileName: file.name,
                 fileContent: r,
                 labels: [],
                 connections: [],
                 state: "pending",
+                createDate: date,
+                changeDate: date,
             })
-        )
+        })
     })
 }
 const handleFileDelete = (index: number) => {

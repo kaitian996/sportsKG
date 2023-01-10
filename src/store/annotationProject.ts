@@ -22,6 +22,8 @@ export type annotationProject = {
         labels: labels[]
         connections: connections[]
         state: string
+        createDate: string
+        changeDate: string
     }[]
     labelCategories: labelCategories[]
     connectionCategories: connectionCategories[]

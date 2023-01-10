@@ -281,7 +281,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, watch, onMounted, nextTick } from "vue"
+import {
+    ref,
+    reactive,
+    computed,
+    watch,
+    onMounted,
+    nextTick,
+    onUnmounted,
+} from "vue"
 import { useRoute } from "vue-router"
 import { annotationProjectStore } from "@/store/annotationProject"
 import { ArrowRight } from "@element-plus/icons-vue"
@@ -501,6 +509,15 @@ watch(currentSelectConnection, (newValue) => {
 watch([leftOpen, rightOpen], () => {
     console.log("reload")
     nextTick(registerAnnotator)
+})
+
+//离开页面，更新时间
+onUnmounted(() => {
+    const nowDate = new Date()
+    const date = `${nowDate.getFullYear()}-${
+        nowDate.getMonth() + 1
+    }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
+    currentTask.changeDate = date
 })
 </script>
 
