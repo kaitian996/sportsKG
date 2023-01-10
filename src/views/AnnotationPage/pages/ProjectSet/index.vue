@@ -433,74 +433,98 @@
                     <div class="right-content">
                         <div class="ui-title">UI预览</div>
                         <div class="ui-view">
-                            <!-- 自动补全标签tags -->
-                            <div
-                                class="view-tags tags-auto"
-                                v-if="
-                                    areaIndex === 0 &&
-                                    computedAnnotationData.autoKey?.length! > 0
-                                "
-                            >
+                            <div class="view-tags-box">
+                                <!-- 自动补全标签tags -->
                                 <div
-                                    class="tag-item"
-                                    v-for="item in computedAnnotationData.autoKey"
-                                    @click="currentSelectLabel = item.text!"
+                                    class="view-tags tags-auto"
+                                    v-if="
+                                        areaIndex === 0 &&
+                                        computedAnnotationData.autoKey?.length! > 0
+                                    "
                                 >
                                     <div
-                                        class="tag-head"
-                                        :style="`--color:#95e1d3`"
-                                    ></div>
-                                    <div
-                                        class="tag-content"
-                                        :style="`--color:#95e1d326`"
+                                        class="tag-item"
+                                        v-for="(
+                                            item, index
+                                        ) in computedAnnotationData.autoKey"
+                                        @click="currentSelectLabel = item.text!"
                                     >
-                                        <span class="tag-text">{{
-                                            item.text
-                                        }}</span>
-                                        <span class="tag-hotkey">1</span>
+                                        <div
+                                            class="tag-head"
+                                            :style="`--color:#95e1d3`"
+                                        ></div>
+                                        <div
+                                            class="tag-content"
+                                            :style="`--color:#95e1d326`"
+                                        >
+                                            <span class="tag-text">{{
+                                                item.text
+                                            }}</span>
+                                            <span class="tag-hotkey">
+                                                {{
+                                                    keyboardMap["autoKey"][
+                                                        index
+                                                    ].ref
+                                                }}</span
+                                            >
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- 普通标签tags -->
-                            <div class="view-tags" v-if="areaIndex === 0">
-                                <div
-                                    class="tag-item"
-                                    v-for="item in computedAnnotationData.labelCategories"
-                                    @click="currentSelectLabel = item.id!"
-                                >
+                                <!-- 普通标签tags -->
+                                <div class="view-tags" v-if="areaIndex === 0">
                                     <div
-                                        class="tag-head"
-                                        :style="`--color:${item.color}`"
-                                    ></div>
-                                    <div
-                                        class="tag-content"
-                                        :style="`--color:${item.color + 26}`"
+                                        class="tag-item"
+                                        v-for="(
+                                            item, index
+                                        ) in computedAnnotationData.labelCategories"
+                                        @click="currentSelectLabel = item.id!"
                                     >
-                                        <span class="tag-text">{{
-                                            item.text
-                                        }}</span>
-                                        <span class="tag-hotkey">1</span>
+                                        <div
+                                            class="tag-head"
+                                            :style="`--color:${item.color}`"
+                                        ></div>
+                                        <div
+                                            class="tag-content"
+                                            :style="`--color:${
+                                                item.color + 26
+                                            }`"
+                                        >
+                                            <span class="tag-text">{{
+                                                item.text
+                                            }}</span>
+                                            <span class="tag-hotkey">{{
+                                                keyboardMap["signalKey"][index]
+                                                    .ref
+                                            }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="view-tags" v-if="areaIndex === 1">
-                                <div
-                                    class="tag-item"
-                                    v-for="item in computedAnnotationData.connectionCategories"
-                                    @click="currentSelectConnection = item.id!"
-                                >
+                                <div class="view-tags" v-if="areaIndex === 1">
                                     <div
-                                        class="tag-head"
-                                        :style="`--color:#95e1d3`"
-                                    ></div>
-                                    <div
-                                        class="tag-content"
-                                        :style="`--color:#95e1d326`"
+                                        class="tag-item"
+                                        v-for="(
+                                            item, index
+                                        ) in computedAnnotationData.connectionCategories"
+                                        @click="
+                                            currentSelectConnection = item.id!
+                                        "
                                     >
-                                        <span class="tag-text">{{
-                                            item.text
-                                        }}</span>
-                                        <span class="tag-hotkey">1</span>
+                                        <div
+                                            class="tag-head"
+                                            :style="`--color:#95e1d3`"
+                                        ></div>
+                                        <div
+                                            class="tag-content"
+                                            :style="`--color:#95e1d326`"
+                                        >
+                                            <span class="tag-text">{{
+                                                item.text
+                                            }}</span>
+                                            <span class="tag-hotkey">{{
+                                                keyboardMap["connectKey"][index]
+                                                    .ref
+                                            }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -691,6 +715,7 @@ import {
     computed,
     nextTick,
     isReactive,
+    onMounted,
 } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { ArrowRight } from "@element-plus/icons-vue"
@@ -705,6 +730,7 @@ import {
 } from "@/hooks/useCreateAnnotationData"
 import { Annotator, Action } from "poplar-annotation"
 import { ElMessage, ElNotification } from "element-plus"
+import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const currentProject = useProjection.annotationProject[pID]
@@ -927,6 +953,49 @@ const computedAnnotationData = computed(() => {
     )
     data.autoKey = currentProject.autoKey
     return data
+})
+//增加键盘热键
+//增加标注功能
+const keyboardMap = computed(() => {
+    return {
+        autoKey: useKeyToKeyboard(
+            computedAnnotationData.value.autoKey!,
+            "autoKey"
+        ),
+        signalKey: useKeyToKeyboard(
+            computedAnnotationData.value.labelCategories,
+            "signalKey"
+        ),
+        connectKey: useKeyToKeyboard(
+            computedAnnotationData.value.connectionCategories,
+            "connectKey"
+        ),
+    }
+})
+onMounted(() => {
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
+        const key = e.key
+        const autokey = keyboardMap.value.autoKey.find(
+            (item) => item.ref === key
+        )
+        if (autokey) {
+            currentSelectLabel.value = autokey.value
+            return
+        }
+        const signalkey = keyboardMap.value.signalKey.find(
+            (item) => item.ref === key
+        )
+        if (signalkey) {
+            currentSelectLabel.value = signalkey.value
+            return
+        }
+        const connectkey = keyboardMap.value.connectKey.find(
+            (item) => item.ref === key
+        )
+        if (connectkey) {
+            currentSelectConnection.value = connectkey.value as number
+        }
+    })
 })
 const annotationContainer = ref<HTMLElement>()
 let annotator: Annotator
@@ -1406,38 +1475,40 @@ const removeProject = () => {
                         font-weight: 500;
                     }
                     .ui-view {
-                        .view-tags {
-                            display: flex;
-                            flex-wrap: wrap;
-                            max-height: 100px;
+                        .view-tags-box{
+                            max-height: 200px;
                             overflow: auto;
-                            .tag-item {
+                            .view-tags {
                                 display: flex;
-                                margin-right: 5px;
-                                margin-bottom: 5px;
-                                cursor: pointer;
-                                .tag-head {
-                                    width: 3px;
-                                    background: var(--color);
-                                    border-radius: 3px 0 0 3px;
-                                }
-                                .tag-content {
-                                    background: var(--color);
-                                    padding: 0 5px;
-                                    border-radius: 0 4px 4px 0;
-
-                                    .tag-text {
-                                        margin-right: 5px;
+                                flex-wrap: wrap;
+                                .tag-item {
+                                    display: flex;
+                                    margin-right: 5px;
+                                    margin-bottom: 5px;
+                                    cursor: pointer;
+                                    .tag-head {
+                                        width: 3px;
+                                        background: var(--color);
+                                        border-radius: 3px 0 0 3px;
                                     }
-                                    .tag-hotkey {
-                                        color: rgba(0, 0, 0, 0.4);
+                                    .tag-content {
+                                        background: var(--color);
+                                        padding: 0 5px;
+                                        border-radius: 0 4px 4px 0;
+    
+                                        .tag-text {
+                                            margin-right: 5px;
+                                        }
+                                        .tag-hotkey {
+                                            color: rgba(0, 0, 0, 0.4);
+                                        }
                                     }
                                 }
                             }
-                        }
-                        .tags-auto {
-                            margin-bottom: 5px;
-                            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                            .tags-auto {
+                                margin-bottom: 5px;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                            }
                         }
                         .view-content {
                             margin: 20px 0;
