@@ -696,7 +696,7 @@ const openDownloaderDig = (index: number) => {
     outputOptions.tID = index
     outputOptions.fileName =
         index === -1
-            ? currentProject.name + "do"
+            ? currentProject.name + "-do"
             : currentProject.data[index].fileName + "-do"
     openDownloader.value = true
 }
