@@ -382,7 +382,7 @@
                                 <p>
                                     导出数据的的每一行的格式:支持自定义
                                     <br />
-                                    提供四个数据项：
+                                    提供六个数据项：
                                     <br />
                                     索引：${index}、起始实体：${startEntity}、起始实体标签：${startLabel}
                                     <br />
@@ -393,10 +393,10 @@
                                 <p>
                                     例如：
                                     <br />
-                                    输入格式：${index} - ${startEntity} -
-                                    ${connection} - ${endEntity}
+                                    输入格式：${index} - ${startLabel} - ${startEntity} -
+                                    ${connection} - ${endEntity} - ${endLabel}
                                     <br />
-                                    输出结果：0 - 北京 - 首都 - 中国
+                                    输出结果：0 - B-LOC - 北京 - 首都 - 中国 - B-LOC
                                 </p>
                             </el-alert>
                             <el-form-item label="导出格式">
@@ -769,13 +769,12 @@ const getComputedConnectionCount = (tID: number) => {
             align-items: center;
             justify-content: space-around;
             .step-item {
-                flex: 1;
                 text-align: center;
                 margin: 0 5px;
                 border-radius: 4px;
-                padding: 2px 16px;
+                padding: 2px 100px;
                 color: rgba(0, 0, 0, 0.6);
-                max-width: 30%;
+                max-width: 50%;
             }
             .item-active {
                 background: #fff;
@@ -848,13 +847,12 @@ const getComputedConnectionCount = (tID: number) => {
             align-items: center;
             justify-content: space-around;
             .step-item {
-                flex: 1;
                 text-align: center;
                 margin: 0 5px;
                 border-radius: 4px;
                 padding: 2px 16px;
                 color: rgba(0, 0, 0, 0.6);
-                max-width: 30%;
+                max-width: 50%;
             }
             .item-active {
                 background: #fff;
