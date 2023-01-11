@@ -19,7 +19,15 @@
                     "
                     >项目设置</el-button
                 >
-                <el-button @click="openUploader = true">数据导入</el-button>
+                <el-button @click="openUploader = true" type="primary"
+                    >数据导入</el-button
+                >
+                <el-button
+                    type="success"
+                    @click="openDownloaderDig(-1)"
+                    :disabled="selectedTaskList.length === 0"
+                    >项目数据导出</el-button
+                >
             </div>
         </header>
         <!-- 中间 -->
@@ -28,8 +36,10 @@
                 height="600"
                 style="width: 100%"
                 :data="showData"
-                size="large "
+                size="large"
+                @selection-change="handleSelectionChange"
             >
+                <el-table-column type="selection" width="55" />
                 <el-table-column label="ID" width="200">
                     <template #default="scope">
                         {{ scope.$index }}
@@ -369,7 +379,6 @@
                             <el-form-item label="标签模式">
                                 <el-radio-group
                                     v-model="outputOptions.label.isWholeLabel"
-                                    class=""
                                 >
                                     <el-radio :label="false">单体标签</el-radio>
                                     <el-radio :label="true">整体标签</el-radio>
@@ -641,8 +650,17 @@ const outputOptions = reactive({
 })
 const openDownloaderDig = (index: number) => {
     outputOptions.tID = index
-    outputOptions.fileName = currentProject.data[index].fileName + "-do"
+    outputOptions.fileName =
+        index === -1
+            ? currentProject.name + "do"
+            : currentProject.data[index].fileName + "-do"
     openDownloader.value = true
+}
+const selectedTaskList = ref<number[]>([])
+const handleSelectionChange = (selected: typeof currentProject.data) => {
+    selectedTaskList.value = selected.map((data) => {
+        return currentProject.data.findIndex((item) => item === data)
+    })
 }
 const outputForm = ref<FormInstance>()
 const closeDownloader = (close: Function) => {
@@ -666,7 +684,6 @@ const toDownloadTheFile = () => {
     const output: any = {
         pID: pID,
         tID: outputOptions.tID,
-        fileName: outputOptions.fileName,
         type: outputOptions.type,
     }
     switch (outputOptions.type) {
@@ -698,9 +715,18 @@ const toDownloadTheFile = () => {
             }
             break
     }
-    console.log(output)
-    useDownload(output)
-    //导出数据
+    if (outputOptions.tID !== -1) {
+        //下载单文件
+        const lineContent = useDownload(output)
+    } else {
+        const list = [...selectedTaskList.value].sort((a, b) => a - b)
+        const lineContent: string[] = []
+        list.forEach((item) => {
+            output.tID = item
+            lineContent.push(...useDownload(output))
+        })
+    }
+    //关闭
     closeDownloader(() => (openDownloader.value = false))
 }
 //文件细节
