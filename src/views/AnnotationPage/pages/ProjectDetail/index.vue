@@ -355,6 +355,28 @@
                     </el-space>
                     <!-- labels 数据导出 -->
                     <div v-if="outputOptions.type === 'label'">
+                        <!-- 整标签标注· -->
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p v-if="outputOptions.label.isWholeLabel">
+                                    将该项目标签视为整体标签，将对标注实体自动生成:B-、I-、E-
+                                    拆分
+                                </p>
+                                <p v-if="!outputOptions.label.isWholeLabel">
+                                    将该项目标签视为单体标签，直接输出
+                                </p>
+                            </el-alert>
+                            <el-form-item label="标签模式">
+                                <el-radio-group
+                                    v-model="outputOptions.label.isWholeLabel"
+                                    class=""
+                                >
+                                    <el-radio :label="false">单体标签</el-radio>
+                                    <el-radio :label="true">整体标签</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-space>
+                        <!-- 格式 -->
                         <el-space fill>
                             <el-alert type="info" show-icon :closable="false">
                                 <p>
@@ -393,10 +415,12 @@
                                 <p>
                                     例如：
                                     <br />
-                                    输入格式：${index} - ${startLabel} - ${startEntity} -
-                                    ${connection} - ${endEntity} - ${endLabel}
+                                    输入格式：${index} - ${startLabel} -
+                                    ${startEntity} - ${connection} -
+                                    ${endEntity} - ${endLabel}
                                     <br />
-                                    输出结果：0 - B-LOC - 北京 - 首都 - 中国 - B-LOC
+                                    输出结果：0 - B-LOC - 北京 - 首都 - 中国 -
+                                    B-LOC
                                 </p>
                             </el-alert>
                             <el-form-item label="导出格式">
@@ -408,6 +432,27 @@
                     </div>
                     <!-- all 全文数据导出 -->
                     <div v-if="outputOptions.type === 'all'">
+                        <!-- 整标签标注· -->
+                        <el-space fill>
+                            <el-alert type="info" show-icon :closable="false">
+                                <p v-if="outputOptions.all.isWholeLabel">
+                                    将该项目标签视为整体标签，将对标注实体自动生成:B-、I-、E-
+                                    拆分
+                                </p>
+                                <p v-if="!outputOptions.label.isWholeLabel">
+                                    将该项目标签视为单体标签，直接输出
+                                </p>
+                            </el-alert>
+                            <el-form-item label="标签模式">
+                                <el-radio-group
+                                    v-model="outputOptions.all.isWholeLabel"
+                                    class=""
+                                >
+                                    <el-radio :label="false">单体标签</el-radio>
+                                    <el-radio :label="true">整体标签</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-space>
                         <el-space fill>
                             <el-alert type="info" show-icon :closable="false">
                                 <p>
@@ -582,6 +627,7 @@ const outputOptions = reactive({
     fileName: "",
     type: "label",
     label: {
+        isWholeLabel: false,
         format: "${label} ${entity}",
     },
     connection: {
@@ -590,6 +636,7 @@ const outputOptions = reactive({
     all: {
         format: "${label} ${entity}",
         autoFill: null,
+        isWholeLabel: false,
     },
 })
 const openDownloaderDig = (index: number) => {
@@ -601,11 +648,16 @@ const outputForm = ref<FormInstance>()
 const closeDownloader = (close: Function) => {
     close()
     outputOptions.type = "label"
-    outputOptions.label.format = "${label} ${entity}"
-    outputOptions.connection.format =
-        "${startEntity} ${connection} ${endEntity}"
-    outputOptions.all.format = "${label} ${entity}"
-    outputOptions.all.autoFill = null
+    if (!outputOptions.label.format) {
+        outputOptions.label.format = "${label} ${entity}"
+    }
+    if (!outputOptions.connection.format) {
+        outputOptions.connection.format =
+            "${startEntity} ${connection} ${endEntity}"
+    }
+    if (!outputOptions.all.format) {
+        outputOptions.all.format = "${label} ${entity}"
+    }
 }
 const toDownloadTheFile = () => {
     if (!outputOptions.fileName) {
@@ -624,6 +676,7 @@ const toDownloadTheFile = () => {
             }
             output.label = {
                 format: "`" + outputOptions.label.format + "`",
+                isWholeLabel: outputOptions.label.isWholeLabel,
             }
             break
         case "connection":
@@ -641,6 +694,7 @@ const toDownloadTheFile = () => {
             output.all = {
                 format: "`" + outputOptions.all.format + "`",
                 autoFill: outputOptions.all.autoFill,
+                isWholeLabel: outputOptions.all.isWholeLabel,
             }
             break
     }
@@ -873,7 +927,7 @@ const getComputedConnectionCount = (tID: number) => {
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
-        height: 70vh;
+        height: 75vh;
         overflow: auto;
         padding: 30px 0;
     }

@@ -8,12 +8,14 @@ type DownloadOptions = {
     type: string
     label?: {
         format: string
+        isWholeLabel: boolean
     }
     connection?: {
         format: string
     }
     all?: {
         format: string
+        isWholeLabel: boolean
         autoFill: null | {
             id?: number | undefined
             text: string
@@ -37,20 +39,89 @@ export const useDownload = (options: DownloadOptions) => {
     const lineContent: string[] = []
     if (type === "label") {
         const format = options.label?.format!
-        for (let i = 0; i < annotationData.labels.length; i++) {
-            const index = i
+        const isWholeLabel = options.label?.isWholeLabel!
+        const outPutLabels: labels[] = [...annotationData.labels].sort(
+            (a, b) => a.startIndex - b.startIndex
+        )
+        let index = 0
+        for (let i = 0; i < outPutLabels.length; i++) {
             //取到标签
-            const label = annotationData.labelCategories.find(
-                (item) => item.id === annotationData.labels[i].categoryId
+            const _label = annotationData.labelCategories.find(
+                (item) => item.id === outPutLabels[i].categoryId
             )?.text
             //取到实体
-            const entity = annotationData.content.slice(
-                annotationData.labels[i].startIndex,
-                annotationData.labels[i].endIndex
+            const _entity = annotationData.content.slice(
+                outPutLabels[i].startIndex,
+                outPutLabels[i].endIndex
             )
-            if (entity !== "\n" && entity !== "\r") {
-                const line: string = eval(format)
-                lineContent.push(line + "\n")
+            if (isWholeLabel) {
+                //在实体上面判断
+                if (_entity.length === 1) {
+                    if (_entity !== "\n" && _entity !== "\r") {
+                        const label = "B-" + _label
+                        const entity = _entity
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                } else if (_entity.length === 2) {
+                    if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                        const label = "B-" + _label
+                        const entity = _entity[0]
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    if (_entity[1] !== "\n" && _entity[1] !== "\r") {
+                        const label = "E-" + _label
+                        const entity = _entity[1]
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                } else if (_entity.length >= 3) {
+                    const length = _entity.length
+                    //第一位
+                    if (
+                        _entity.slice(0, 1) !== "\n" &&
+                        _entity.slice(0, 1) !== "\r"
+                    ) {
+                        const label = "B-" + _label
+                        const entity = _entity.slice(0, 1)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    //中间
+                    if (
+                        _entity.slice(1, length - 1) !== "\n" &&
+                        _entity.slice(1, length - 1) !== "\r"
+                    ) {
+                        const label = "I-" + _label
+                        const entity = _entity.slice(1, length - 1)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    //末尾
+                    if (
+                        _entity.slice(length - 1, length) !== "\n" &&
+                        _entity.slice(length - 1, length) !== "\r"
+                    ) {
+                        const label = "E-" + _label
+                        const entity = _entity.slice(length - 1, length)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                }
+            } else {
+                if (_entity !== "\n" && _entity !== "\r") {
+                    const label = _label
+                    const entity = _entity
+                    const line: string = eval(format)
+                    lineContent.push(line + "\n")
+                }
             }
         }
     } else if (type === "connection") {
@@ -91,7 +162,12 @@ export const useDownload = (options: DownloadOptions) => {
             const connection = annotationData.connectionCategories.find(
                 (item) => item.id === annotationData.connections[i].categoryId
             )?.text
-            if (startEntity !== "\n" && endEntity !== "\n" && startEntity !== "\r" && endEntity !== "\r") {
+            if (
+                startEntity !== "\n" &&
+                endEntity !== "\n" &&
+                startEntity !== "\r" &&
+                endEntity !== "\r"
+            ) {
                 const line: string = eval(format)
                 lineContent.push(line + "\n")
             }
@@ -99,6 +175,8 @@ export const useDownload = (options: DownloadOptions) => {
     } else if (type === "all") {
         const format = options.all?.format!
         const autoFill = options.all?.autoFill
+        const isWholeLabel = options.all?.isWholeLabel!
+        const outPutLabels: labels[] = [...annotationData.labels]
         if (autoFill) {
             const result: labels[] = []
             for (let i = 0; i < annotationData.content.length; i++) {
@@ -119,44 +197,100 @@ export const useDownload = (options: DownloadOptions) => {
                     })
                 }
             }
-            const allLabels = [...result, ...annotationData.labels].sort(
-                (a, b) => a.startIndex - b.startIndex
+            outPutLabels.push(...result)
+        }
+        const afterFillLabels = outPutLabels.sort(
+            (a, b) => a.startIndex - b.startIndex
+        )
+        let index = 0
+        for (let i = 0; i < afterFillLabels.length; i++) {
+            const isFillLabel = afterFillLabels[i].id === -1 ? true : false
+            //取到标签
+            const _label = annotationData.labelCategories.find(
+                (item) => item.id === afterFillLabels[i].categoryId
+            )?.text
+            //取到实体
+            const _entity = annotationData.content.slice(
+                afterFillLabels[i].startIndex,
+                afterFillLabels[i].endIndex
             )
-            for (let i = 0; i < allLabels.length; i++) {
-                const index = i
-                //取到标签
-                const label = annotationData.labelCategories.find(
-                    (item) => item.id === allLabels[i].categoryId
-                )?.text
-                //取到实体
-                const entity = annotationData.content.slice(
-                    allLabels[i].startIndex,
-                    allLabels[i].endIndex
-                )
-                if (entity !== "\n" && entity !== "\r") {
-                    const line: string = eval(format)
-                    lineContent.push(line + "\n")
+            if (isWholeLabel && !isFillLabel) {
+                //在实体上面判断
+                if (_entity.length === 1) {
+                    if (_entity !== "\n" && _entity !== "\r") {
+                        const label = "B-" + _label
+                        const entity = _entity
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                } else if (_entity.length === 2) {
+                    if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                        const label = "B-" + _label
+                        const entity = _entity[0]
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    if (_entity[1] !== "\n" && _entity[1] !== "\r") {
+                        const label = "E-" + _label
+                        const entity = _entity[1]
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                } else if (_entity.length >= 3) {
+                    const length = _entity.length
+                    //第一位
+                    if (
+                        _entity.slice(0, 1) !== "\n" &&
+                        _entity.slice(0, 1) !== "\r"
+                    ) {
+                        const label = "B-" + _label
+                        const entity = _entity.slice(0, 1)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    //中间
+                    if (
+                        _entity.slice(1, length - 1) !== "\n" &&
+                        _entity.slice(1, length - 1) !== "\r"
+                    ) {
+                        const label = "I-" + _label
+                        const entity = _entity.slice(1, length - 1)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
+                    //末尾
+                    if (
+                        _entity.slice(length - 1, length) !== "\n" &&
+                        _entity.slice(length - 1, length) !== "\r"
+                    ) {
+                        const label = "E-" + _label
+                        const entity = _entity.slice(length - 1, length)
+                        const line: string = eval(format)
+                        lineContent.push(line + "\n")
+                        index++
+                    }
                 }
-            }
-        } else {
-            for (let i = 0; i < annotationData.labels.length; i++) {
-                const index = i
-                //取到标签
-                const label = annotationData.labelCategories.find(
-                    (item) => item.id === annotationData.labels[i].categoryId
-                )?.text
-                //取到实体
-                const entity = annotationData.content.slice(
-                    annotationData.labels[i].startIndex,
-                    annotationData.labels[i].endIndex
-                )
-                if (entity !== "\n" && entity !== "\r") {
+            } else {
+                if (_entity !== "\n" && _entity !== "\r") {
+                    const label = _label
+                    const entity = _entity
                     const line: string = eval(format)
                     lineContent.push(line + "\n")
                 }
             }
         }
     }
+    console.log(lineContent)
+
+    return lineContent
+}
+
+export const useCreateLink = (fileName: string, lineContent: string[]) => {
     //下载
     const blob = new Blob(lineContent, { type: "text/plain,charset=UTF-8" })
     const downloadElement = document.createElement("a")
