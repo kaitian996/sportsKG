@@ -783,15 +783,59 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
             const date = `${nowDate.getFullYear()}-${
                 nowDate.getMonth() + 1
             }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
-            projectData.data.push({
-                fileName: file.name,
-                fileContent: r,
-                labels: [],
-                connections: [],
-                state: "pending",
-                createDate: date,
-                changeDate: date,
-            })
+            //增加切片
+            const fiberSize:number =10000
+            const fiber = Math.floor(r.length / fiberSize)
+            const baseFileName = file.name
+            const baseFileContent = r
+            let lastPoint: number = 0 //存储上一次向右寻找的的位移
+
+            for (let i = 0; i < fiber; i++) {
+                let r: string = ""
+                if (i !== fiber - 1) {
+                    //说明还没到最后一部分
+                    let index = 0
+                    let end = baseFileContent.slice(
+                        (i + 1) * fiberSize,
+                        (i + 1) * fiberSize + 1
+                    ) //
+                    while (!end.endsWith("。")) {
+                        index++
+                        end = baseFileContent.slice(
+                            (i + 1) * fiberSize + index,
+                            (i + 1) * fiberSize + index + 1
+                        )
+                    }
+                    if (i === 0) { //第一部分
+                        r = baseFileContent.slice(
+                            i * fiberSize + lastPoint,
+                            (i + 1) * fiberSize + index+1
+                        )
+                    }else{
+
+                    }
+                    r = baseFileContent.slice(
+                        i * fiberSize + lastPoint+1,
+                        (i + 1) * fiberSize + index+1
+                    )
+                    lastPoint = index
+                } else {
+                    r = baseFileContent.slice(i * fiberSize)
+                }
+                if (r) {
+                    projectData.data.push({
+                        fileName:
+                            baseFileName +
+                            `-${(Array(4).join("0") + i).slice(-4)}`,
+                        fileContent: r,
+                        labels: [],
+                        connections: [],
+                        state: "pending",
+                        createDate: date,
+                        changeDate: date,
+                    })
+                }
+            }
         })
     })
 }
