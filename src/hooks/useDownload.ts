@@ -48,11 +48,10 @@ export const useDownload = (options: DownloadOptions) => {
                 annotationData.labels[i].startIndex,
                 annotationData.labels[i].endIndex
             )
-            let line = eval(format)
-            if (!line.endsWith("\n")) {
-                line = line + "\n"
+            if (entity !== "\n" && entity !== "\r") {
+                const line: string = eval(format)
+                lineContent.push(line + "\n")
             }
-            lineContent.push(line)
         }
     } else if (type === "connection") {
         const format = options.connection?.format!
@@ -92,12 +91,10 @@ export const useDownload = (options: DownloadOptions) => {
             const connection = annotationData.connectionCategories.find(
                 (item) => item.id === annotationData.connections[i].categoryId
             )?.text
-
-            let line = eval(format)
-            if (!line.endsWith("\n")) {
-                line = line + "\n"
+            if (startEntity !== "\n" && endEntity !== "\n" && startEntity !== "\r" && endEntity !== "\r") {
+                const line: string = eval(format)
+                lineContent.push(line + "\n")
             }
-            lineContent.push(line)
         }
     } else if (type === "all") {
         const format = options.all?.format!
@@ -136,11 +133,10 @@ export const useDownload = (options: DownloadOptions) => {
                     allLabels[i].startIndex,
                     allLabels[i].endIndex
                 )
-                let line = eval(format)
-                if (!line.endsWith("\n")) {
-                    line = line + "\n"
+                if (entity !== "\n" && entity !== "\r") {
+                    const line: string = eval(format)
+                    lineContent.push(line + "\n")
                 }
-                lineContent.push(line)
             }
         } else {
             for (let i = 0; i < annotationData.labels.length; i++) {
@@ -154,15 +150,12 @@ export const useDownload = (options: DownloadOptions) => {
                     annotationData.labels[i].startIndex,
                     annotationData.labels[i].endIndex
                 )
-                let line = eval(format)
-                if (!line.endsWith("\n")) {
-                    line = line + "\n"
+                if (entity !== "\n" && entity !== "\r") {
+                    const line: string = eval(format)
+                    lineContent.push(line + "\n")
                 }
-                lineContent.push(line)
             }
         }
-        console.log(lineContent);
-        
     }
     //下载
     const blob = new Blob(lineContent, { type: "text/plain,charset=UTF-8" })
