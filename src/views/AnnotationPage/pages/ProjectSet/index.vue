@@ -760,9 +760,10 @@ const addNewLabel = () => {
         ElMessage.info(`已添加${newLabel.value}标签`)
     } else {
         //降序排列
-        const max =
-            [...currentProject.labelCategories].sort((a, b) => b.id! - a.id!)[0]
-                ?.id || -1
+        let max = [...currentProject.labelCategories].sort(
+            (a, b) => b.id! - a.id!
+        )[0]?.id
+        if (max === undefined) max = -1
         currentProject.labelCategories.push({
             id: max + 1,
             text: newLabel.value,
