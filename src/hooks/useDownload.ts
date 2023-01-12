@@ -347,7 +347,6 @@ export const useDownload = (options: DownloadOptions) => {
             }
         }
     }
-    console.log(lineContent)
 
     return lineContent
 }

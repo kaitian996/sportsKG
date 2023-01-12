@@ -475,7 +475,7 @@
                                 <p v-if="outputOptions.all.isWholeLabel">
                                     将该项目标签视为整体标签，将对标注实体拆分并自动生成前缀
                                 </p>
-                                <p v-if="!outputOptions.label.isWholeLabel">
+                                <p v-if="!outputOptions.all.isWholeLabel">
                                     将该项目标签视为单体标签，直接输出
                                 </p>
                             </el-alert>
@@ -586,7 +586,7 @@ import {
 } from "element-plus"
 import { connections, labels } from "@/hooks/useCreateAnnotationData"
 import SimplePie from "@/components/StdChart/SimplePie.vue"
-import { useDownload } from "@/hooks/useDownload"
+import { useCreateLink, useDownload } from "@/hooks/useDownload"
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const currentProject = useProjection.annotationProject[pID]
@@ -837,6 +837,7 @@ const toDownloadTheFile = () => {
     if (outputOptions.tID !== -1) {
         //下载单文件
         const lineContent = useDownload(output)
+        useCreateLink(outputOptions.fileName, lineContent)
     } else {
         const list = [...selectedTaskList.value].sort((a, b) => a - b)
         const lineContent: string[] = []
@@ -844,6 +845,7 @@ const toDownloadTheFile = () => {
             output.tID = item
             lineContent.push(...useDownload(output))
         })
+        useCreateLink(outputOptions.fileName, lineContent)
     }
     //关闭
     closeDownloader(() => (openDownloader.value = false))
@@ -1073,7 +1075,7 @@ const getComputedConnectionCount = (tID: number) => {
         justify-content: flex-start;
         box-sizing: border-box;
         min-height: 75vh;
-        max-height:80vh;
+        max-height: 80vh;
         overflow: auto;
         padding: 30px 0;
     }
