@@ -573,6 +573,21 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
             const fiber = Math.floor(r.length / fiberSize)
             const baseFileName = file.name
             const baseFileContent = r
+            if (fiber === 0) {
+                //说明小于fiberSize,不需要切分
+                if (r) {
+                    uploadFlieList.value.push({
+                        fileName: baseFileName,
+                        fileContent: r,
+                        labels: [],
+                        connections: [],
+                        state: "pending",
+                        createDate: date,
+                        changeDate: date,
+                    })
+                }
+                return
+            }
             let lastPoint: number = 0 //存储上一次向右寻找的的位移
 
             for (let i = 0; i < fiber; i++) {

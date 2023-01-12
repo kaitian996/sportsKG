@@ -784,12 +784,26 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
                 nowDate.getMonth() + 1
             }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
             //增加切片
-            const fiberSize:number =10000
+            const fiberSize: number = 10000
             const fiber = Math.floor(r.length / fiberSize)
             const baseFileName = file.name
             const baseFileContent = r
+            if (fiber === 0) {
+                //说明小于fiberSize,不需要切分
+                if (r) {
+                    projectData.data.push({
+                        fileName: baseFileName,
+                        fileContent: r,
+                        labels: [],
+                        connections: [],
+                        state: "pending",
+                        createDate: date,
+                        changeDate: date,
+                    })
+                }
+                return
+            }
             let lastPoint: number = 0 //存储上一次向右寻找的的位移
-
             for (let i = 0; i < fiber; i++) {
                 let r: string = ""
                 if (i !== fiber - 1) {
@@ -806,17 +820,17 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
                             (i + 1) * fiberSize + index + 1
                         )
                     }
-                    if (i === 0) { //第一部分
+                    if (i === 0) {
+                        //第一部分
                         r = baseFileContent.slice(
                             i * fiberSize + lastPoint,
-                            (i + 1) * fiberSize + index+1
+                            (i + 1) * fiberSize + index + 1
                         )
-                    }else{
-
+                    } else {
                     }
                     r = baseFileContent.slice(
-                        i * fiberSize + lastPoint+1,
-                        (i + 1) * fiberSize + index+1
+                        i * fiberSize + lastPoint + 1,
+                        (i + 1) * fiberSize + index + 1
                     )
                     lastPoint = index
                 } else {
