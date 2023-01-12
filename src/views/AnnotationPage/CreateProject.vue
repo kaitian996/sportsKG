@@ -325,11 +325,11 @@
                                         >
                                             <div
                                                 class="header-show"
-                                                :style="'background:#95e1d3'"
+                                                :style="'background:orange'"
                                             ></div>
                                             <div
                                                 class="content-show"
-                                                :style="'--background:#95e1d326'"
+                                                :style="'--background:#ffa50026'"
                                             >
                                                 <span class="label-code">
                                                     {{ item.text }}
@@ -639,6 +639,34 @@ watch(areaIndex, () => {
 })
 const defaultLabelCategories = [
     {
+        text: "LOC",
+        color: "#95e1d3",
+    },
+    {
+        text: "ORG",
+        color: "#fcbad3",
+    },
+    {
+        text: "PER",
+        color: "#ff7e67",
+    },
+    {
+        text: "LEAGUE",
+        color: "#f25d9c",
+    },
+    {
+        text: "TEAM",
+        color: "#d4a5a5",
+    },
+    {
+        text: "RANK",
+        color: "#f1c40f",
+    },
+    {
+        text: "O",
+        color: "#757a79",
+    },
+    {
         text: "B-LOC",
         color: "#95e1d3",
     },
@@ -709,10 +737,6 @@ const defaultLabelCategories = [
     {
         text: "E-RANK",
         color: "#7e80ff",
-    },
-    {
-        text: "O",
-        color: "#757a79",
     },
 ]
 const newLabel = ref("")
