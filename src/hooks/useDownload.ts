@@ -9,6 +9,7 @@ type DownloadOptions = {
     label?: {
         format: string
         isWholeLabel: boolean
+        wholeLabelMode: string
     }
     connection?: {
         format: string
@@ -16,6 +17,7 @@ type DownloadOptions = {
     all?: {
         format: string
         isWholeLabel: boolean
+        wholeLabelMode: string
         autoFill: null | {
             id?: number | undefined
             text: string
@@ -55,64 +57,94 @@ export const useDownload = (options: DownloadOptions) => {
                 outPutLabels[i].endIndex
             )
             if (isWholeLabel) {
-                //在实体上面判断
-                if (_entity.length === 1) {
-                    if (_entity !== "\n" && _entity !== "\r") {
+                //然判断什么模式
+                const wholeLabelMode = options.label?.wholeLabelMode!
+                if (wholeLabelMode === "BI") {
+                    if (_entity.length === 1) {
                         const label = "B-" + _label
                         const entity = _entity
                         const line: string = eval(format)
                         lineContent.push(line + "\n")
                         index++
+                    } else if (_entity.length >= 2) {
+                        if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity[0]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        if (
+                            _entity.slice(1) !== "\n" &&
+                            _entity.slice(1) !== "\r"
+                        ) {
+                            const label = "I-" + _label
+                            const entity = _entity.slice(1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
                     }
-                } else if (_entity.length === 2) {
-                    if (_entity[0] !== "\n" && _entity[0] !== "\r") {
-                        const label = "B-" + _label
-                        const entity = _entity[0]
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    if (_entity[1] !== "\n" && _entity[1] !== "\r") {
-                        const label = "E-" + _label
-                        const entity = _entity[1]
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                } else if (_entity.length >= 3) {
-                    const length = _entity.length
-                    //第一位
-                    if (
-                        _entity.slice(0, 1) !== "\n" &&
-                        _entity.slice(0, 1) !== "\r"
-                    ) {
-                        const label = "B-" + _label
-                        const entity = _entity.slice(0, 1)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    //中间
-                    if (
-                        _entity.slice(1, length - 1) !== "\n" &&
-                        _entity.slice(1, length - 1) !== "\r"
-                    ) {
-                        const label = "I-" + _label
-                        const entity = _entity.slice(1, length - 1)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    //末尾
-                    if (
-                        _entity.slice(length - 1, length) !== "\n" &&
-                        _entity.slice(length - 1, length) !== "\r"
-                    ) {
-                        const label = "E-" + _label
-                        const entity = _entity.slice(length - 1, length)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
+                } else if (wholeLabelMode === "BIE") {
+                    //在实体上面判断
+                    if (_entity.length === 1) {
+                        if (_entity !== "\n" && _entity !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                    } else if (_entity.length === 2) {
+                        if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity[0]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        if (_entity[1] !== "\n" && _entity[1] !== "\r") {
+                            const label = "E-" + _label
+                            const entity = _entity[1]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                    } else if (_entity.length >= 3) {
+                        const length = _entity.length
+                        //第一位
+                        if (
+                            _entity.slice(0, 1) !== "\n" &&
+                            _entity.slice(0, 1) !== "\r"
+                        ) {
+                            const label = "B-" + _label
+                            const entity = _entity.slice(0, 1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        //中间
+                        if (
+                            _entity.slice(1, length - 1) !== "\n" &&
+                            _entity.slice(1, length - 1) !== "\r"
+                        ) {
+                            const label = "I-" + _label
+                            const entity = _entity.slice(1, length - 1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        //末尾
+                        if (
+                            _entity.slice(length - 1, length) !== "\n" &&
+                            _entity.slice(length - 1, length) !== "\r"
+                        ) {
+                            const label = "E-" + _label
+                            const entity = _entity.slice(length - 1, length)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
                     }
                 }
             } else {
@@ -215,64 +247,94 @@ export const useDownload = (options: DownloadOptions) => {
                 afterFillLabels[i].endIndex
             )
             if (isWholeLabel && !isFillLabel) {
-                //在实体上面判断
-                if (_entity.length === 1) {
-                    if (_entity !== "\n" && _entity !== "\r") {
+                //然判断什么模式
+                const wholeLabelMode = options.all?.wholeLabelMode!
+                if (wholeLabelMode === "BI") {
+                    if (_entity.length === 1) {
                         const label = "B-" + _label
                         const entity = _entity
                         const line: string = eval(format)
                         lineContent.push(line + "\n")
                         index++
+                    } else if (_entity.length >= 2) {
+                        if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity[0]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        if (
+                            _entity.slice(1) !== "\n" &&
+                            _entity.slice(1) !== "\r"
+                        ) {
+                            const label = "I-" + _label
+                            const entity = _entity.slice(1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
                     }
-                } else if (_entity.length === 2) {
-                    if (_entity[0] !== "\n" && _entity[0] !== "\r") {
-                        const label = "B-" + _label
-                        const entity = _entity[0]
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    if (_entity[1] !== "\n" && _entity[1] !== "\r") {
-                        const label = "E-" + _label
-                        const entity = _entity[1]
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                } else if (_entity.length >= 3) {
-                    const length = _entity.length
-                    //第一位
-                    if (
-                        _entity.slice(0, 1) !== "\n" &&
-                        _entity.slice(0, 1) !== "\r"
-                    ) {
-                        const label = "B-" + _label
-                        const entity = _entity.slice(0, 1)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    //中间
-                    if (
-                        _entity.slice(1, length - 1) !== "\n" &&
-                        _entity.slice(1, length - 1) !== "\r"
-                    ) {
-                        const label = "I-" + _label
-                        const entity = _entity.slice(1, length - 1)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
-                    }
-                    //末尾
-                    if (
-                        _entity.slice(length - 1, length) !== "\n" &&
-                        _entity.slice(length - 1, length) !== "\r"
-                    ) {
-                        const label = "E-" + _label
-                        const entity = _entity.slice(length - 1, length)
-                        const line: string = eval(format)
-                        lineContent.push(line + "\n")
-                        index++
+                } else if (wholeLabelMode === "BIE") {
+                    //在实体上面判断
+                    if (_entity.length === 1) {
+                        if (_entity !== "\n" && _entity !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                    } else if (_entity.length === 2) {
+                        if (_entity[0] !== "\n" && _entity[0] !== "\r") {
+                            const label = "B-" + _label
+                            const entity = _entity[0]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        if (_entity[1] !== "\n" && _entity[1] !== "\r") {
+                            const label = "E-" + _label
+                            const entity = _entity[1]
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                    } else if (_entity.length >= 3) {
+                        const length = _entity.length
+                        //第一位
+                        if (
+                            _entity.slice(0, 1) !== "\n" &&
+                            _entity.slice(0, 1) !== "\r"
+                        ) {
+                            const label = "B-" + _label
+                            const entity = _entity.slice(0, 1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        //中间
+                        if (
+                            _entity.slice(1, length - 1) !== "\n" &&
+                            _entity.slice(1, length - 1) !== "\r"
+                        ) {
+                            const label = "I-" + _label
+                            const entity = _entity.slice(1, length - 1)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
+                        //末尾
+                        if (
+                            _entity.slice(length - 1, length) !== "\n" &&
+                            _entity.slice(length - 1, length) !== "\r"
+                        ) {
+                            const label = "E-" + _label
+                            const entity = _entity.slice(length - 1, length)
+                            const line: string = eval(format)
+                            lineContent.push(line + "\n")
+                            index++
+                        }
                     }
                 }
             } else {

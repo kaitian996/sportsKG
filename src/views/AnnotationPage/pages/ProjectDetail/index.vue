@@ -369,8 +369,7 @@
                         <el-space fill>
                             <el-alert type="info" show-icon :closable="false">
                                 <p v-if="outputOptions.label.isWholeLabel">
-                                    将该项目标签视为整体标签，将对标注实体自动生成:B-、I-、E-
-                                    拆分
+                                    将该项目标签视为整体标签，将对标注实体拆分并自动生成前缀
                                 </p>
                                 <p v-if="!outputOptions.label.isWholeLabel">
                                     将该项目标签视为单体标签，直接输出
@@ -382,6 +381,35 @@
                                 >
                                     <el-radio :label="false">单体标签</el-radio>
                                     <el-radio :label="true">整体标签</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-space>
+                        <!-- 模式 -->
+                        <el-space fill v-if="outputOptions.label.isWholeLabel">
+                            <el-alert type="info" show-icon :closable="false">
+                                <p
+                                    v-if="
+                                        outputOptions.label.wholeLabelMode ===
+                                        'BI'
+                                    "
+                                >
+                                    将对标注实体拆分并自动生成前缀:B-、I-、
+                                </p>
+                                <p
+                                    v-if="
+                                        outputOptions.label.wholeLabelMode ===
+                                        'BIE'
+                                    "
+                                >
+                                    将对标注实体拆分并自动生成前缀:B-、I-、E-、
+                                </p>
+                            </el-alert>
+                            <el-form-item label="前缀模式">
+                                <el-radio-group
+                                    v-model="outputOptions.label.wholeLabelMode"
+                                >
+                                    <el-radio :label="'BI'">BI</el-radio>
+                                    <el-radio :label="'BIE'">BIE</el-radio>
                                 </el-radio-group>
                             </el-form-item>
                         </el-space>
@@ -445,8 +473,7 @@
                         <el-space fill>
                             <el-alert type="info" show-icon :closable="false">
                                 <p v-if="outputOptions.all.isWholeLabel">
-                                    将该项目标签视为整体标签，将对标注实体自动生成:B-、I-、E-
-                                    拆分
+                                    将该项目标签视为整体标签，将对标注实体拆分并自动生成前缀
                                 </p>
                                 <p v-if="!outputOptions.label.isWholeLabel">
                                     将该项目标签视为单体标签，直接输出
@@ -459,6 +486,35 @@
                                 >
                                     <el-radio :label="false">单体标签</el-radio>
                                     <el-radio :label="true">整体标签</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-space>
+                        <!-- 模式 -->
+                        <el-space fill v-if="outputOptions.all.isWholeLabel">
+                            <el-alert type="info" show-icon :closable="false">
+                                <p
+                                    v-if="
+                                        outputOptions.all.wholeLabelMode ===
+                                        'BI'
+                                    "
+                                >
+                                    将对标注实体拆分并自动生成前缀:B-、I-、
+                                </p>
+                                <p
+                                    v-if="
+                                        outputOptions.all.wholeLabelMode ===
+                                        'BIE'
+                                    "
+                                >
+                                    将对标注实体拆分并自动生成前缀:B-、I-、E-、
+                                </p>
+                            </el-alert>
+                            <el-form-item label="前缀模式">
+                                <el-radio-group
+                                    v-model="outputOptions.all.wholeLabelMode"
+                                >
+                                    <el-radio :label="'BI'">BI</el-radio>
+                                    <el-radio :label="'BIE'">BIE</el-radio>
                                 </el-radio-group>
                             </el-form-item>
                         </el-space>
@@ -696,6 +752,7 @@ const outputOptions = reactive({
     type: "label",
     label: {
         isWholeLabel: false,
+        wholeLabelMode: "BI",
         format: "${label} ${entity}",
     },
     connection: {
@@ -705,6 +762,7 @@ const outputOptions = reactive({
         format: "${label} ${entity}",
         autoFill: null,
         isWholeLabel: false,
+        wholeLabelMode: "BI",
     },
 })
 const openDownloaderDig = (index: number) => {
@@ -753,6 +811,7 @@ const toDownloadTheFile = () => {
             output.label = {
                 format: "`" + outputOptions.label.format + "`",
                 isWholeLabel: outputOptions.label.isWholeLabel,
+                wholeLabelMode: outputOptions.label.wholeLabelMode,
             }
             break
         case "connection":
@@ -771,6 +830,7 @@ const toDownloadTheFile = () => {
                 format: "`" + outputOptions.all.format + "`",
                 autoFill: outputOptions.all.autoFill,
                 isWholeLabel: outputOptions.all.isWholeLabel,
+                wholeLabelMode: outputOptions.all.wholeLabelMode,
             }
             break
     }
@@ -1012,7 +1072,8 @@ const getComputedConnectionCount = (tID: number) => {
         flex-direction: column;
         justify-content: flex-start;
         box-sizing: border-box;
-        height: 75vh;
+        min-height: 75vh;
+        max-height:80vh;
         overflow: auto;
         padding: 30px 0;
     }
