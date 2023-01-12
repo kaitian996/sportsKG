@@ -1279,21 +1279,6 @@ watch(currentMenuIndex, (newValue, oldValue) => {
         }
         if (
             newValue === 1 &&
-            currentProject.connectionCategories.length === 0
-        ) {
-            currentProject.connectionCategories.push(
-                ...defaultConnectionCategories
-                    .slice(0, 3)
-                    .map((item, index) => {
-                        return {
-                            id: index,
-                            text: item.text,
-                        }
-                    })
-            )
-        }
-        if (
-            newValue === 1 &&
             first &&
             currentProject.labelCategories.length !== 0
         ) {

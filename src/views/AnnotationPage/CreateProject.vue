@@ -1047,13 +1047,6 @@ watch(activeStep, (newValue, oldValue) => {
             )
         })
     }
-    if (newValue === 2 && projectData.connectionCategories.length === 0) {
-        nextTick(() => {
-            projectData.connectionCategories.push(
-                ...defaultConnectionCategories.slice(0, 3)
-            )
-        })
-    }
 })
 //保存项目
 const projectStore = annotationProjectStore()
