@@ -32,11 +32,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
             import("../views/AnnotationPage/pages/TextAnnotation/index.vue"),
     },
+    {
+        path: "/refresh",
+        component: () => import("../components/Refresh/index.vue"),
+    },
 ]
 
 const router = createRouter({
     history: createWebHashHistory(),
     routes,
 })
-
 export default router

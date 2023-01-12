@@ -15,6 +15,68 @@
                 }}</el-breadcrumb-item>
                 <el-breadcrumb-item>标注</el-breadcrumb-item>
             </el-breadcrumb>
+            <!-- 按钮组 -->
+            <div class="btn-group">
+                <el-popover placement="bottom" :width="200" trigger="click">
+                    <template #reference>
+                        <el-tag
+                            :type="state[currentTask.state].type"
+                            trigger="click"
+                            style="cursor: pointer"
+                        >
+                            {{ state[currentTask.state].info }}</el-tag
+                        >
+                    </template>
+                    <div
+                        class="state-select"
+                        :style="`
+                                    display: flex;
+                                    justify-content: space-around;
+                                    align-items: center;
+                                    cursor: pointer
+                                    `"
+                    >
+                        <el-tag
+                            class="tag"
+                            @click="currentTask.state = 'pending'"
+                            >进行中</el-tag
+                        >
+                        <el-tag
+                            class="tag"
+                            @click="currentTask.state = 'resolve'"
+                            type="success"
+                            >已完成</el-tag
+                        >
+                        <el-tag
+                            class="tag"
+                            @click="currentTask.state = 'reject'"
+                            type="danger"
+                            >已终止</el-tag
+                        >
+                    </div>
+                </el-popover>
+                <el-button-group>
+                    <el-button
+                        @click="toPrevious"
+                        type="primary"
+                        text
+                        bg
+                        :icon="ArrowLeft"
+                        :disabled="tID === 0"
+                        >Previous</el-button
+                    >
+                    <el-button
+                        @click="toNext"
+                        type="primary"
+                        text
+                        bg
+                        :disabled="tID === currentProject.data.length - 1"
+                    >
+                        Next
+                        <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+                    </el-button>
+                </el-button-group>
+            </div>
         </header>
         <!-- 中间 -->
         <section class="annotation-content">
@@ -290,20 +352,56 @@ import {
     nextTick,
     onUnmounted,
 } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { annotationProjectStore } from "@/store/annotationProject"
-import { ArrowRight } from "@element-plus/icons-vue"
+import { ArrowRight, ArrowLeft } from "@element-plus/icons-vue"
 import { Annotator, Action } from "poplar-annotation"
 import { useCreateAnnotationData } from "@/hooks/useCreateAnnotationData"
 import { ElMessage } from "element-plus"
 import { useElementResize, useWindowResize } from "@/hooks/useWindowResize"
 import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
 //路由参数
+console.log("重新执行setup")
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const tID = Number(useRoute().query.tID)
 const currentProject = useProjection.annotationProject[pID]
 const currentTask = currentProject.data[tID]
+const router = useRouter()
+//右上角按钮
+//状态
+const state: any = {
+    pending: {
+        type: "",
+        info: "进行中",
+    },
+    resolve: {
+        type: "success",
+        info: "已完成",
+    },
+    reject: {
+        type: "danger",
+        info: "已终止",
+    },
+}
+const toPrevious = () => {
+    router.replace({
+        path: "/refresh",
+        query: {
+            pID,
+            tID: tID - 1,
+        },
+    })
+}
+const toNext = () => {
+    router.replace({
+        path: "/refresh",
+        query: {
+            pID,
+            tID: tID + 1,
+        },
+    })
+}
 //左右侧菜单展开
 const leftOpen = ref(true)
 const rightOpen = ref(true)
@@ -533,6 +631,12 @@ onUnmounted(() => {
         box-sizing: border-box;
         padding: 0 2%;
         background: #fff;
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 18%;
+        }
     }
     .annotation-content {
         display: flex;
