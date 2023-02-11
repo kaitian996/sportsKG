@@ -60,6 +60,7 @@ export const useDownload = (options: DownloadOptions) => {
                 //然判断什么模式
                 const wholeLabelMode = options.label?.wholeLabelMode!
                 if (wholeLabelMode === "BI") {
+                    //BI模式
                     if (_entity.length === 1) {
                         const label = "B-" + _label
                         const entity = _entity
@@ -78,11 +79,17 @@ export const useDownload = (options: DownloadOptions) => {
                             _entity.slice(1) !== "\n" &&
                             _entity.slice(1) !== "\r"
                         ) {
-                            const label = "I-" + _label
-                            const entity = _entity.slice(1)
-                            const line: string = eval(format)
-                            lineContent.push(line + "\n")
-                            index++
+                            //从头到尾的遍历一遍
+                            _entity
+                                .slice(1)
+                                .split("")
+                                .forEach((item) => {
+                                    const label = "I-" + _label
+                                    const entity = item
+                                    const line: string = eval(format)
+                                    lineContent.push(line + "\n")
+                                    index++
+                                })
                         }
                     }
                 } else if (wholeLabelMode === "BIE") {
@@ -111,6 +118,7 @@ export const useDownload = (options: DownloadOptions) => {
                             index++
                         }
                     } else if (_entity.length >= 3) {
+                        //长度大于三
                         const length = _entity.length
                         //第一位
                         if (
@@ -128,11 +136,16 @@ export const useDownload = (options: DownloadOptions) => {
                             _entity.slice(1, length - 1) !== "\n" &&
                             _entity.slice(1, length - 1) !== "\r"
                         ) {
-                            const label = "I-" + _label
-                            const entity = _entity.slice(1, length - 1)
-                            const line: string = eval(format)
-                            lineContent.push(line + "\n")
-                            index++
+                            _entity
+                                .slice(1, length - 1)
+                                .split("")
+                                .forEach((item) => {
+                                    const label = "I-" + _label
+                                    const entity = item
+                                    const line: string = eval(format)
+                                    lineContent.push(line + "\n")
+                                    index++
+                                })
                         }
                         //末尾
                         if (
@@ -247,7 +260,7 @@ export const useDownload = (options: DownloadOptions) => {
                 afterFillLabels[i].endIndex
             )
             if (isWholeLabel && !isFillLabel) {
-                //然判断什么模式
+                //判断什么模式
                 const wholeLabelMode = options.all?.wholeLabelMode!
                 if (wholeLabelMode === "BI") {
                     if (_entity.length === 1) {
