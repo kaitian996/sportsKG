@@ -281,11 +281,17 @@ export const useDownload = (options: DownloadOptions) => {
                             _entity.slice(1) !== "\n" &&
                             _entity.slice(1) !== "\r"
                         ) {
-                            const label = "I-" + _label
-                            const entity = _entity.slice(1)
-                            const line: string = eval(format)
-                            lineContent.push(line + "\n")
-                            index++
+                            //从头到尾的遍历一遍
+                            _entity
+                                .slice(1)
+                                .split("")
+                                .forEach((item) => {
+                                    const label = "I-" + _label
+                                    const entity = item
+                                    const line: string = eval(format)
+                                    lineContent.push(line + "\n")
+                                    index++
+                                })
                         }
                     }
                 } else if (wholeLabelMode === "BIE") {
@@ -331,11 +337,16 @@ export const useDownload = (options: DownloadOptions) => {
                             _entity.slice(1, length - 1) !== "\n" &&
                             _entity.slice(1, length - 1) !== "\r"
                         ) {
-                            const label = "I-" + _label
-                            const entity = _entity.slice(1, length - 1)
-                            const line: string = eval(format)
-                            lineContent.push(line + "\n")
-                            index++
+                            _entity
+                                .slice(1, length - 1)
+                                .split("")
+                                .forEach((item) => {
+                                    const label = "I-" + _label
+                                    const entity = item
+                                    const line: string = eval(format)
+                                    lineContent.push(line + "\n")
+                                    index++
+                                })
                         }
                         //末尾
                         if (
