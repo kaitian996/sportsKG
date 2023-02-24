@@ -1,17 +1,11 @@
 <template>
     <main class="search-home-container">
-        <Header :isWhiteImage="false" :isWhiteText="'#0069c2'" class="head-wapper"></Header>
-        <!-- 视频背景 -->
-        <video class="background_video" autoplay loop muted playbackRate="1">
-            <source src="./video/bg.mp4" type="video/mp4">
-        </video>
+        <Header :isWhiteImage="true" :isWhiteText="'#0069c2'" class="head-wapper"></Header>
         <!-- 输入框 -->
         <div class="input-warpper">
-            <!-- 背景标题 -->
-            <p class="animate__animated animate__fadeInDown">知识图谱搜索</p>
             <!-- 输入框 -->
             <div class="input-box animate__animated animate__fadeIn">
-                <input type="text" placeholder="输入搜索词或主题" v-model="inputSearch" @keyup.enter="getSearchEntity">
+                <input type="text" placeholder="输入搜索词或主题" v-model="inputSearch" @keyup.enter="getSearchEntity" />
                 <span @click="inputSearch = ''" class="delete-icon"><svg t="1657855668772" class="icon"
                         viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5125">
                         <path
@@ -29,75 +23,166 @@
                             fill="#515151" p-id="2265"></path>
                     </svg></span>
             </div>
-            <!-- 示例 -->
-                <h2 class="search-example">搜索示例:</h2>
-                <ul class="input-example animate__animated animate__bounce">
-                    <li @click="inputSearch = item" v-for="(item, index) in inputExample" :key="index">{{ item }}</li>
-                </ul>
         </div>
+        <!-- 词云框 -->
+        <div class="wordcloud-wapper" @click="toGetEntity" v-show="searchState.isWordCloud">
+            <canvas id="world-cloud-canvas" width="600" height="600" style="width: 70%; max-width: 700px">
+            </canvas>
+            <div style="display: none" id="weightTags"></div>
+        </div>
+        <!-- 图框 -->
+        <div class="graph-wapper" v-show="searchState.isGraph">
+            <div class="graph-instance" ref="graphInstanceRef">
+                图
+            </div>
+        </div>
+        <!-- 底部 -->
+        <Footer></Footer>
     </main>
 </template>
- 
- 
-<script lang='ts' setup>
-import Header from '@/components/Header/index.vue'
-import { ref, reactive, onMounted } from 'vue'
+
+<script lang="ts" setup>
+import Header from "@/components/Header/index.vue"
+import { ref, reactive, onMounted, watch, nextTick } from "vue"
+//@ts-ignore
+import tagCanvas from "tag-canvas"
+import Footer from '@/components/Footer/index.vue'
+import { useGetEntity } from "@/hooks/useGetData";
+
 //输入逻辑块
-const inputSearch = ref<string | number>('')
-const inputExample = reactive<string[]>(['梅西', '内马尔', '马拉多纳', '罗纳尔多', '贝克汉姆', '贝利', '安德雷斯', '韦恩'])
-const getSearchEntity = () => {
+const inputSearch = ref<string | number>("")
+const getSearchEntity = async () => {
+    if (inputSearch.value) {
+        const entityList = await useGetEntity(inputSearch.value)
+        const resultList = entityList.map(entity => ({ name: entity }))
+        if (resultList.length > 1 || resultList.length === 0) {
+            wordCloudMap.value.length = 0
+            wordCloudMap.value.push(...resultList)
+            searchState.isGraph = false
+            searchState.isWordCloud = true
+            nextTick(() => startWorldCloud(true))
+        } else {
+            //找三元组数据
+            searchState.isWordCloud = false
+            searchState.isGraph = true
+        }
+    }
 }
+//管理搜索的状态机
+const searchState = reactive({
+    isWordCloud: true,
+    isGraph: false
+})
+//词云
+const wordCloud = ref<HTMLElement>()
+const wordCloudMap = ref<{ name: string }[]>([{ name: '梅西' }, { name: '内马尔' }, { name: '马拉多纳' }, { name: '罗纳尔多' }, { name: '贝克汉姆' }, { name: '贝利' }, { name: '安德雷斯' }, { name: '韦恩' }])
+//启动词云
+const startWorldCloud = (updateFlag: boolean) => {
+    createTagListDom();
+    const o = {
+        maxSpeed: 0.04, // 添加最大的运动速度
+        minSpeed: 0.02, // 添加最小的运动速度这样就可以保证一直运动，不会停止
+        textHeight: 13,
+        outlineMethod: "none", // tag hover 之后的 轮廓效果
+        noTagsMessage: false,
+        imageMode: "text",
+        fadeIn: 800,
+        outlineColour: "#fff456aa",
+        outlineOffset: 0,
+        depth: 0.5,
+        wheelZoom: false,
+        reverse: true, // 运动方向与鼠标移动方向相反
+        shuffleTags: true,
+        stretchX: 0.7, // Stretch or compress the cloud horizontally. 水平拉伸词云
+        stretchY: 0.7,
+        initial: [0.1, 0.1], // 给词云添加一个初始的运动方向
+        textFont: null, // 字体设置为 null 就会继承 每个 tag的a 标签的字体
+        textColour: null, // 字体颜色设置为 null 就会继承 每个 tag的a 标签的字体颜色
+    }
+    try {
+        // 如果不是更新，说明是第一次渲染，就启动 tagcanvas, 否则就代表更新
+        if (!updateFlag) {
+            tagCanvas.Start("world-cloud-canvas", "weightTags", o)
+        } else {
+            tagCanvas.Update("world-cloud-canvas")
+        }
+    } catch (e) { }
+}
+const createTagListDom = () => {
+    const res = [...wordCloudMap.value]
+    const fragment = new DocumentFragment();
+    const colorList: string[] = ['#2D4DB6', '#04B67C', '#D1AF07', '#E27914', '#CB4A4D', '#B02690']
+    function randomNum(minNum: any, maxNum: any) {
+        switch (arguments.length) {
+            case 1:
+                return parseInt(String(Math.random() * minNum + 1), 10);
+                break;
+            case 2:
+                return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+                break;
+            default:
+                return 0;
+                break;
+        }
+    }
+    for (let i = 0; i < res.length; i++) {
+        const a = document.createElement("a");
+        // 字符串长度大于10就要换行
+        if (res[i].name.length > 10) {
+            let charArr = res[i].name.split("");
+            charArr.splice(10, 0, "<br>");
+            res[i].name = charArr.join("");
+        }
+        a.href = "javascript:void(0)";
+        a.innerHTML = res[i].name;
+        a.setAttribute("value", res[i].name)
+        a.className = "tags-link"
+        a.style.color = colorList[randomNum(0, colorList.length - 1)]
+        //设置颜色和样式
+        fragment.append(a);
+    }
+    // 更新 tagContainer中的 tag元素
+    const tagsContainer = document.querySelector("#weightTags");
+    tagsContainer!.innerHTML = "";
+    tagsContainer!.append(fragment);
+}
+onMounted(() => {
+    startWorldCloud(false);
+})
+//a标签的点击事件
+const toGetEntity = (e: any) => {
+    const entity: string = e.target.getAttribute("value")
+    if (entity) {
+        inputSearch.value = entity.replace("<br>", "")
+        getSearchEntity()
+    }
+}
+
+//展示的图
+const graphInstanceRef = ref<HTMLElement>()
 </script>
- 
-<style scoped lang="less">
+
+<style lang="less">
 .search-home-container {
     position: relative;
-    height: 100vh;
-    width: 100vw;
-}
+    background: #fc29;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
-.background_video {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    // top: 0;
-    min-width: 100vw;
-    min-height: 100vh;
-    height: 100vh;
-    width: 100vw;
-    filter: grayscale(30%);
-    z-index: -11;
-    object-fit: cover;
-
-    source {
-        min-width: 100vw;
-        min-height: 100vh;
-        height: auto;
-        width: auto;
-    }
 }
 
 .input-warpper {
     width: 100%;
-    height: 550px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
     padding-top: 72px;
     color: #fff;
-
-    p {
-        font-size: 44px;
-        font-weight: 600;
-        line-height: 56px;
-        letter-spacing:2px;
-        padding: 0 40px 40px;
-        width: 535px;
-        color: #fff;
-        text-align: center;
-    }
+    position: absolute;
 
     .input-box {
         min-width: 50%;
@@ -115,7 +200,8 @@ const getSearchEntity = () => {
 
         &:hover,
         &:focus-within {
-            box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 2px 4px 1px rgb(0 0 0 / 18%);
+            box-shadow: 0 0 0 1px rgb(0 0 0 / 10%),
+                0 2px 4px 1px rgb(0 0 0 / 18%);
             border-left: 1px solid transparent;
             border-right: none;
             border-top: 1px solid transparent;
@@ -135,9 +221,9 @@ const getSearchEntity = () => {
             padding: 0 30px;
             border-top-left-radius: 30px;
             border-bottom-left-radius: 30px;
-            color: rgb(113, 109, 109);
+            color: rgb(0, 0, 0);
             background: #fff;
-            opacity: .7;
+            opacity: 0.7;
         }
 
         .span-style() {
@@ -168,30 +254,29 @@ const getSearchEntity = () => {
             .span-style;
         }
     }
-    
+
     .search-example {
         margin-top: 10px;
     }
+}
 
-    .input-example {
-        display: flex;
-        flex-wrap: wrap;
-        max-width: 50%;
-        margin-top: 50px;
+.wordcloud-wapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        li {
-            display: block;
-            border: 1px solid #fff;
-            min-width: 70px;
-            min-height: 30px;
-            text-align: center;
-            border-radius: 30px;
-            margin-left: 5px;
-            margin-top: 5px;
-            line-height: 30px;
-            padding: 0 5px;
-            cursor: pointer;
-        }
+    .tags-link {
+        font-family: PingFangSC-Regular, "sans-serif", Microsoft YaHei;
     }
+}
+
+.graph-wapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>

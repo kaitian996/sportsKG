@@ -11,7 +11,7 @@ export const useGetEntity = async (mention: any) => {
     /**其它接口 */
     console.log('实体', temp);
 
-    return [...temp, ...temp1]
+    return [...temp]
 }
 
 /**

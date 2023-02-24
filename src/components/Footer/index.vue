@@ -96,6 +96,7 @@ import { ref, reactive } from 'vue'
         margin:0 auto;
         margin-bottom: 10px;
     }
+    color: #fff;
     text-align: center;
     padding-top: 10px;
     min-height:60px;
