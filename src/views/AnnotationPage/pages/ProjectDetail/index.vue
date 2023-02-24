@@ -104,9 +104,9 @@
                         </el-popover>
                     </template>
                 </el-table-column>
-                <el-table-column show-overflow-tooltip label="数据" width="400">
+                <el-table-column label="数据" width="400">
                     <template #default="scope">
-                        {{ scope.row.fileContent }}
+                        {{ scope.row.fileContent.slice(0,6)+'...' }}
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
@@ -161,10 +161,10 @@
                         </el-popover>
                     </template>
                 </el-table-column>
-                <el-table-column type="expand" width="100">
+                <!-- <el-table-column type="expand" width="100">
                     <template #default="props">
                         <div class="task-detail">
-                            <!-- 数据 -->
+                            <!== 数据 ==>
                             <div class="task-data">
                                 <p class="task-data-item">
                                     文件名称：{{ props.row.fileName }}
@@ -197,7 +197,7 @@
                                     }}
                                 </p>
                             </div>
-                            <!-- label图 -->
+                            <!== label图 ==>
                             <div class="task-label-chart">
                                 <SimplePie
                                     :seriesData="
@@ -206,7 +206,7 @@
                                     title="实体标注饼图"
                                 ></SimplePie>
                             </div>
-                            <!-- 三元组图 -->
+                            <!== 三元组图 ==>
                             <div class="task-connection-cahrt">
                                 <SimplePie
                                     title="关系标注饼图"
@@ -217,7 +217,7 @@
                             </div>
                         </div>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
         </section>
     </main>

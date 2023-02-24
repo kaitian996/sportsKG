@@ -341,17 +341,17 @@ const changeShow = (index: number) => {
             }
 
 
-            &:hover {
-                .card-box {
-                    transform: translateX(-100%);
+            // &:hover {
+            //     .card-box {
+            //         transform: translateX(-100%);
 
-                    & .left-card-item {
-                        &:first-child {
-                            border-right: none;
-                        }
-                    }
-                }
-            }
+            //         & .left-card-item {
+            //             &:first-child {
+            //                 border-right: none;
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 
