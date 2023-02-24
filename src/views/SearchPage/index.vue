@@ -33,7 +33,6 @@
         <!-- 图框 -->
         <div class="graph-wapper" v-show="searchState.isGraph">
             <div class="graph-instance" ref="graphInstanceRef">
-                图
             </div>
         </div>
         <!-- 底部 -->
@@ -47,7 +46,11 @@ import { ref, reactive, onMounted, watch, nextTick } from "vue"
 //@ts-ignore
 import tagCanvas from "tag-canvas"
 import Footer from '@/components/Footer/index.vue'
-import { useGetEntity } from "@/hooks/useGetData";
+import { useGetEntity, useGetEntityData } from "@/hooks/useGetData";
+import type { Graph, GraphData, INode, Item } from "@antv/g6"
+import useGraphData, { edge, node } from "@/hooks/useGraphData";
+import useGraph from "@/hooks/useGraph";
+import axios from "axios";
 
 //输入逻辑块
 const inputSearch = ref<string | number>("")
@@ -63,8 +66,16 @@ const getSearchEntity = async () => {
             nextTick(() => startWorldCloud(true))
         } else {
             //找三元组数据
+            const result = await useGetEntityData(inputSearch.value)
+            graphData.nodes.length = 0
+            graphData.edges.length = 0
+            graphData.nodes.push(...result.nodes)
+            graphData.edges.push(...result.edges)
             searchState.isWordCloud = false
             searchState.isGraph = true
+            nextTick(() => {
+                registerGraphInstance()
+            })
         }
     }
 }
@@ -74,7 +85,6 @@ const searchState = reactive({
     isGraph: false
 })
 //词云
-const wordCloud = ref<HTMLElement>()
 const wordCloudMap = ref<{ name: string }[]>([{ name: '梅西' }, { name: '内马尔' }, { name: '马拉多纳' }, { name: '罗纳尔多' }, { name: '贝克汉姆' }, { name: '贝利' }, { name: '安德雷斯' }, { name: '韦恩' }])
 //启动词云
 const startWorldCloud = (updateFlag: boolean) => {
@@ -159,7 +169,65 @@ const toGetEntity = (e: any) => {
 }
 
 //展示的图
+//图数据
+const graphData = useGraphData([], [])
 const graphInstanceRef = ref<HTMLElement>()
+let graphInstance: Graph
+const registerGraphInstance = () => {
+    if (!graphInstance) {//没有实例就创建一个
+        graphInstance = useGraph(graphInstanceRef)
+        graphInstance.on("node:click", (e) => {
+            const nodeItem = e.item as INode // 获取被点击的节点元素对象
+            loadMoreEntity(nodeItem)
+        })
+        graphInstance.data(graphData)
+        graphInstance.render()
+    } else {
+        graphInstance.changeData(graphData)
+    }
+}
+//加载更多
+const loadMoreEntity = async (item: INode) => {
+    const { id, label } = item._cfg?.model!
+    let startIndex = graphData.nodes.length - 1 //拿到开始递增的id
+
+    //向后端要数据
+    const result = await useGetEntityData(label)
+    console.log(result);
+    const url: string = `http://shuyantech.com/api/cndbpedia/avpair?q=${label}`
+    let tempData: string[][] = []
+    try {
+        let { data } = await axios.get(url)
+        if (data.status === 'ok' && data.ret.length > 0) {
+            tempData = data.ret
+        }
+    } catch (error) {
+    }
+    if (tempData.length) {
+        //结构化为需要的数据
+        const nodes: node[] = []
+        const edges: edge[] = []
+        tempData.forEach(item => {
+            const node: node = {
+                id: String(startIndex),
+                label: item[1]
+            }
+            const edge: edge = {
+                source: String(id),
+                target: String(startIndex),
+                label: item[0]
+            }
+            startIndex++
+            nodes.push(node)
+            edges.push(edge)
+        })
+        graphData.nodes.push(...nodes)
+        graphData.edges.push(...edges)
+        if (graphInstance){
+            graphInstance.changeData(graphData)
+        }
+    }
+}
 </script>
 
 <style lang="less">
@@ -273,10 +341,18 @@ const graphInstanceRef = ref<HTMLElement>()
 }
 
 .graph-wapper {
-    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    .graph-instance {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 99%;
+        height: 100vh;
+    }
 }
 </style>
