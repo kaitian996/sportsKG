@@ -69,6 +69,7 @@ const getSearchEntity = async () => {
             const result = await useGetEntityData(inputSearch.value)
             graphData.nodes.length = 0
             graphData.edges.length = 0
+            updateColor(result.nodes)
             graphData.nodes.push(...result.nodes)
             graphData.edges.push(...result.edges)
             searchState.isWordCloud = false
@@ -85,7 +86,35 @@ const searchState = reactive({
     isGraph: false
 })
 //词云
-const wordCloudMap = ref<{ name: string }[]>([{ name: '梅西' }, { name: '内马尔' }, { name: '马拉多纳' }, { name: '罗纳尔多' }, { name: '贝克汉姆' }, { name: '贝利' }, { name: '安德雷斯' }, { name: '韦恩' }])
+const wordCloudMap = ref<{ name: string }[]>([
+    { name: '梅西' },
+    { name: '内马尔' },
+    { name: '马拉多纳' },
+    { name: '罗纳尔多' },
+    { name: '贝克汉姆' },
+    { name: '贝利' },
+    { name: '安德雷斯' },
+    { name: '韦恩' },
+    { name: '斯蒂法诺' },
+    { name: '加林查' },
+    { name: '马尔蒂尼' },
+    { name: '范巴斯滕' },
+    { name: '齐达内' },
+    { name: '普斯卡什' },
+    { name: '克鲁伊夫' },
+    { name: 'C罗' },
+    { name: '济科' },
+    { name: '罗马里奥' },
+    { name: '雅辛' },
+    { name: '尤西比奥' },
+    { name: '罗纳尔迪尼奥' },
+    { name: '瓦伦蒂诺-马佐拉' },
+    { name: '苏格拉底' },
+    { name: '曼努埃尔-莫雷诺' },
+    { name: '保罗-罗西' },
+    { name: '辛德拉尔' },
+    { name: '斯奇亚菲诺' },
+])
 //启动词云
 const startWorldCloud = (updateFlag: boolean) => {
     createTagListDom();
@@ -118,23 +147,23 @@ const startWorldCloud = (updateFlag: boolean) => {
         }
     } catch (e) { }
 }
+function randomNum(minNum: any, maxNum: any) {
+    switch (arguments.length) {
+        case 1:
+            return parseInt(String(Math.random() * minNum + 1), 10);
+            break;
+        case 2:
+            return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+const colorList: string[] = ['#2D4DB6', '#04B67C', '#D1AF07', '#E27914', '#CB4A4D', '#B02690']
 const createTagListDom = () => {
     const res = [...wordCloudMap.value]
     const fragment = new DocumentFragment();
-    const colorList: string[] = ['#2D4DB6', '#04B67C', '#D1AF07', '#E27914', '#CB4A4D', '#B02690']
-    function randomNum(minNum: any, maxNum: any) {
-        switch (arguments.length) {
-            case 1:
-                return parseInt(String(Math.random() * minNum + 1), 10);
-                break;
-            case 2:
-                return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
-                break;
-            default:
-                return 0;
-                break;
-        }
-    }
     for (let i = 0; i < res.length; i++) {
         const a = document.createElement("a");
         // 字符串长度大于10就要换行
@@ -203,7 +232,10 @@ const loadMoreEntity = async (item: INode) => {
         }
     } catch (error) {
     }
+
     if (tempData.length) {
+        const descIndex: number = tempData.findIndex(item => item[0] === 'DESC')
+        tempData.splice(descIndex, 1)
         //结构化为需要的数据
         const nodes: node[] = []
         const edges: edge[] = []
@@ -221,24 +253,29 @@ const loadMoreEntity = async (item: INode) => {
             nodes.push(node)
             edges.push(edge)
         })
+        updateColor(nodes)
         graphData.nodes.push(...nodes)
         graphData.edges.push(...edges)
-        if (graphInstance){
+        if (graphInstance) {
             graphInstance.changeData(graphData)
         }
     }
+}
+const updateColor = (nodeList: node[]) => {
+    nodeList.forEach(node => {
+        if (!node.style) {
+            node.style = {
+                fill: colorList[randomNum(0, colorList.length - 1)]
+            }
+        }
+    })
 }
 </script>
 
 <style lang="less">
 .search-home-container {
     position: relative;
-    background: #fc29;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
-    /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, rgb(15, 12, 41), rgb(48, 43, 99), rgb(36, 36, 62));
-    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background-color: #11162a;
 
 }
 
@@ -248,7 +285,7 @@ const loadMoreEntity = async (item: INode) => {
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    padding-top: 72px;
+    margin-top: 72px;
     color: #fff;
     position: absolute;
 
@@ -347,6 +384,7 @@ const loadMoreEntity = async (item: INode) => {
     display: flex;
     align-items: center;
     justify-content: center;
+
     .graph-instance {
         display: flex;
         align-items: center;
