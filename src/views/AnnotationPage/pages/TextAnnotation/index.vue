@@ -3,13 +3,9 @@
         <!-- 头部 -->
         <header class="annotation-header">
             <el-breadcrumb :separator-icon="ArrowRight">
-                <el-breadcrumb-item :to="{ path: '/annotation' }"
-                    >项目管理</el-breadcrumb-item
-                >
-                <el-breadcrumb-item
-                    :to="{ path: `/projectDetail`, query: { pID } }"
-                    >{{ currentProject.name }}</el-breadcrumb-item
-                >
+                <el-breadcrumb-item :to="{ path: '/annotation' }">项目管理</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{ path: `/projectDetail`, query: { pID } }">{{ currentProject.name
+                }}</el-breadcrumb-item>
                 <el-breadcrumb-item>{{
                     currentProject.data[tID].fileName
                 }}</el-breadcrumb-item>
@@ -19,61 +15,29 @@
             <div class="btn-group">
                 <el-popover placement="bottom" :width="200" trigger="click">
                     <template #reference>
-                        <el-tag
-                            :type="state[currentTask.state].type"
-                            trigger="click"
-                            style="cursor: pointer"
-                        >
-                            {{ state[currentTask.state].info }}</el-tag
-                        >
+                        <el-tag :type="state[currentTask.state].type" trigger="click" style="cursor: pointer">
+                            {{ state[currentTask.state].info }}</el-tag>
                     </template>
-                    <div
-                        class="state-select"
+                    <div class="state-select"
                         :style="`
-                                    display: flex;
-                                    justify-content: space-around;
-                                    align-items: center;
-                                    cursor: pointer
-                                    `"
-                    >
-                        <el-tag
-                            class="tag"
-                            @click="currentTask.state = 'pending'"
-                            >进行中</el-tag
-                        >
-                        <el-tag
-                            class="tag"
-                            @click="currentTask.state = 'resolve'"
-                            type="success"
-                            >已完成</el-tag
-                        >
-                        <el-tag
-                            class="tag"
-                            @click="currentTask.state = 'reject'"
-                            type="danger"
-                            >已终止</el-tag
-                        >
+                                                            display: flex;
+                                                            justify-content: space-around;
+                                                            align-items: center;
+                                                                                                            cursor: pointer
+                                                                                                                                                                                            `">
+                        <el-tag class="tag" @click="currentTask.state = 'pending'">进行中</el-tag>
+                        <el-tag class="tag" @click="currentTask.state = 'resolve'" type="success">已完成</el-tag>
+                        <el-tag class="tag" @click="currentTask.state = 'reject'" type="danger">已终止</el-tag>
                     </div>
                 </el-popover>
                 <el-button-group>
-                    <el-button
-                        @click="toPrevious"
-                        type="primary"
-                        text
-                        bg
-                        :icon="ArrowLeft"
-                        :disabled="tID === 0"
-                        >Previous</el-button
-                    >
-                    <el-button
-                        @click="toNext"
-                        type="primary"
-                        text
-                        bg
-                        :disabled="tID === currentProject.data.length - 1"
-                    >
+                    <el-button @click="toPrevious" type="primary" text bg :icon="ArrowLeft"
+                        :disabled="tID === 0">Previous</el-button>
+                    <el-button @click="toNext" type="primary" text bg :disabled="tID === currentProject.data.length - 1">
                         Next
-                        <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+                        <el-icon class="el-icon--right">
+                            <ArrowRight />
+                        </el-icon>
                     </el-button>
                 </el-button-group>
             </div>
@@ -81,38 +45,18 @@
         <!-- 中间 -->
         <section class="annotation-content">
             <!-- 左右菜单开关 -->
-            <div
-                class="left-open"
-                v-show="!leftOpen"
-                @click="leftOpen = !leftOpen"
-            >
-                <svg
-                    width="22"
-                    height="22"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+            <div class="left-open" v-show="!leftOpen" @click="leftOpen = !leftOpen">
+                <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M13.5 12.732c1.333-.77 2-1.155 2-1.732s-.667-.962-2-1.732l-2.25-1.3c-1.333-.769-2-1.154-2.5-.865-.5.288-.5 1.058-.5 2.598v2.598c0 1.54 0 2.31.5 2.598.5.289 1.167-.096 2.5-.866l2.25-1.299z"
-                        fill="currentColor"
-                    ></path>
+                        fill="currentColor"></path>
                 </svg>
             </div>
-            <div
-                class="right-open"
-                v-show="!rightOpen"
-                @click="rightOpen = !rightOpen"
-            >
-                <svg
-                    width="22"
-                    height="22"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+            <div class="right-open" v-show="!rightOpen" @click="rightOpen = !rightOpen">
+                <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M9.417 12.552c-1.334-.77-2-1.154-2-1.732 0-.577.666-.962 2-1.732l2.25-1.299c1.333-.77 2-1.155 2.5-.866.5.289.5 1.059.5 2.598v2.598c0 1.54 0 2.31-.5 2.598-.5.289-1.167-.096-2.5-.866l-2.25-1.299z"
-                        fill="currentColor"
-                    ></path>
+                        fill="currentColor"></path>
                 </svg>
             </div>
             <!-- 左侧标注数据 -->
@@ -122,32 +66,17 @@
                     <div class="data-desc">
                         <div class="title">标注实体</div>
                         <div class="tooltip" @click="leftOpen = !leftOpen">
-                            <svg
-                                width="22"
-                                height="22"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                            <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M9.417 12.552c-1.334-.77-2-1.154-2-1.732 0-.577.666-.962 2-1.732l2.25-1.299c1.333-.77 2-1.155 2.5-.866.5.289.5 1.059.5 2.598v2.598c0 1.54 0 2.31-.5 2.598-.5.289-1.167-.096-2.5-.866l-2.25-1.299z"
-                                    fill="currentColor"
-                                ></path>
+                                    fill="currentColor"></path>
                             </svg>
                         </div>
                     </div>
                     <div class="data-order"></div>
                 </div>
-                <el-table
-                    :data="computedAnnotationData.labels"
-                    style="width: 100%"
-                    height="80vh"
-                    stripe
-                >
-                    <el-table-column
-                        label="标签名称"
-                        min-width="50"
-                        show-overflow-tooltip
-                    >
+                <el-table :data="computedAnnotationData.labels" style="width: 100%" height="80vh" stripe>
+                    <el-table-column label="标签名称" min-width="50" show-overflow-tooltip>
                         <template #default="scope">
                             {{
                                 computedAnnotationData.labelCategories.find(
@@ -157,11 +86,7 @@
                             }}
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        label="标签内容"
-                        min-width="50"
-                        show-overflow-tooltip
-                    >
+                    <el-table-column label="标签内容" min-width="50" show-overflow-tooltip>
                         <template #default="scope">
                             {{
                                 computedAnnotationData.content.slice(
@@ -179,22 +104,12 @@
                 <div class="tags-box-area">
                     <!-- auto key -->
                     <div class="view-tags">
-                        <div
-                            class="tag-item"
-                            :style="`--color:green`"
-                            @click="currentSelectLabel = String(item.text)"
+                        <div class="tag-item" :style="`--color:green`" @click="currentSelectLabel = String(item.text)"
                             v-for="(
-                                item, index
-                            ) in computedAnnotationTags.autoKey"
-                        >
-                            <div
-                                class="tag-head"
-                                :style="`--color:green`"
-                            ></div>
-                            <div
-                                class="tag-content"
-                                :style="`--color:#00800026`"
-                            >
+                                                        item, index
+                                                    ) in computedAnnotationTags.autoKey">
+                            <div class="tag-head" :style="`--color:green`"></div>
+                            <div class="tag-content" :style="`--color:#00800026`">
                                 <span class="tag-text">{{ item.text }}</span>
                                 <span class="tag-hotkey">{{
                                     keyboardMap["autoKey"][index].ref
@@ -204,22 +119,12 @@
                     </div>
                     <!-- singal key -->
                     <div class="view-tags">
-                        <div
-                            class="tag-item"
-                            :style="`--color:${item.color}`"
-                            @click="currentSelectLabel = Number(item.id)"
+                        <div class="tag-item" :style="`--color:${item.color}`" @click="currentSelectLabel = Number(item.id)"
                             v-for="(
-                                item, index
-                            ) in computedAnnotationTags.labelCategories"
-                        >
-                            <div
-                                class="tag-head"
-                                :style="`--color:${item.color}`"
-                            ></div>
-                            <div
-                                class="tag-content"
-                                :style="`--color:${item.color + 26}`"
-                            >
+                                                        item, index
+                                                    ) in computedAnnotationTags.labelCategories">
+                            <div class="tag-head" :style="`--color:${item.color}`"></div>
+                            <div class="tag-content" :style="`--color:${item.color + 26}`">
                                 <span class="tag-text">{{ item.text }}</span>
                                 <span class="tag-hotkey">{{
                                     keyboardMap["signalKey"][index].ref
@@ -229,22 +134,12 @@
                     </div>
                     <!-- conncetion key -->
                     <div class="view-tags">
-                        <div
-                            class="tag-item"
-                            :style="`--color:orange`"
-                            @click="currentSelectConnection = Number(item.id)"
+                        <div class="tag-item" :style="`--color:orange`" @click="currentSelectConnection = Number(item.id)"
                             v-for="(
-                                item, index
-                            ) in computedAnnotationTags.connectionCategories"
-                        >
-                            <div
-                                class="tag-head"
-                                :style="`--color:orange`"
-                            ></div>
-                            <div
-                                class="tag-content"
-                                :style="`--color:#ffa50026`"
-                            >
+                                                        item, index
+                                                    ) in computedAnnotationTags.connectionCategories">
+                            <div class="tag-head" :style="`--color:orange`"></div>
+                            <div class="tag-content" :style="`--color:#ffa50026`">
                                 <span class="tag-text">{{ item.text }}</span>
                                 <span class="tag-hotkey">{{
                                     keyboardMap["connectKey"][index].ref
@@ -257,40 +152,22 @@
                 <div class="content-box-area" ref="annotationContainer"></div>
             </div>
             <!-- 右侧关系区域 -->
-            <div
-                class="data-conncetion-area"
-                :class="rightOpen ? '' : 'data-close'"
-            >
+            <div class="data-conncetion-area" :class="rightOpen ? '' : 'data-close'">
                 <div class="data-header">
                     <div class="data-desc">
                         <div class="tooltip" @click="rightOpen = !rightOpen">
-                            <svg
-                                width="22"
-                                height="22"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                            <svg width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M13.5 12.732c1.333-.77 2-1.155 2-1.732s-.667-.962-2-1.732l-2.25-1.3c-1.333-.769-2-1.154-2.5-.865-.5.288-.5 1.058-.5 2.598v2.598c0 1.54 0 2.31.5 2.598.5.289 1.167-.096 2.5-.866l2.25-1.299z"
-                                    fill="currentColor"
-                                ></path>
+                                    fill="currentColor"></path>
                             </svg>
                         </div>
                         <div class="title">标注三元组</div>
                     </div>
                     <div class="data-order"></div>
                 </div>
-                <el-table
-                    :data="computedAnnotationData.connections"
-                    style="width: 100%"
-                    height="80vh"
-                    stripe
-                >
-                    <el-table-column
-                        label="起始实体"
-                        min-width="50"
-                        show-overflow-tooltip
-                    >
+                <el-table :data="computedAnnotationData.connections" style="width: 100%" height="80vh" stripe>
+                    <el-table-column label="起始实体" min-width="50" show-overflow-tooltip>
                         <template #default="scope">
                             {{
                                 computedAnnotationData.content.slice(
@@ -304,11 +181,7 @@
                             }}
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        label="实体关系"
-                        min-width="50"
-                        show-overflow-tooltip
-                    >
+                    <el-table-column label="实体关系" min-width="50" show-overflow-tooltip>
                         <template #default="scope">
                             {{
                                 computedAnnotationData.connectionCategories.find(
@@ -318,11 +191,7 @@
                             }}
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        label="终止实体"
-                        min-width="50"
-                        show-overflow-tooltip
-                    >
+                    <el-table-column label="终止实体" min-width="50" show-overflow-tooltip>
                         <template #default="scope">
                             {{
                                 computedAnnotationData.content.slice(
@@ -360,8 +229,8 @@ import { useCreateAnnotationData } from "@/hooks/useCreateAnnotationData"
 import { ElMessage } from "element-plus"
 import { useElementResize, useWindowResize } from "@/hooks/useWindowResize"
 import { useKeyToKeyboard } from "@/hooks/useKeyToKeyboard"
+import { connect } from "http2"
 //路由参数
-console.log("重新执行setup")
 const useProjection = annotationProjectStore()
 const pID = Number(useRoute().query.pID)
 const tID = Number(useRoute().query.tID)
@@ -462,11 +331,16 @@ const registerAnnotator = () => {
     if (annotator) {
         annotator.remove()
     }
-    annotator = new Annotator(
-        computedAnnotationData.value,
-        annotationContainer.value as HTMLElement,
-        { contentEditable: false }
-    )
+    try {
+        annotator = new Annotator(
+            computedAnnotationData.value,
+            annotationContainer.value as HTMLElement,
+            { contentEditable: false }
+        )
+    } catch (error) {
+        console.log(error);
+    }
+
     //标签增加删除
     annotator.on("textSelected", (startIndex: number, endIndex: number) => {
         currentSelectLabel.value = -1
@@ -476,6 +350,15 @@ const registerAnnotator = () => {
     annotator.on("labelRightClicked", (id: number) => {
         annotator.applyAction(Action.Label.Delete(id))
         currentTask.labels = annotator.store.json.labels
+        //2023/3/12 fix:当删除标签时，也应该将与这个标签相关的关系删除掉，否则会出现bug
+        //查出与这个标签相关的关系
+        //起点,终点都删除
+        computedAnnotationData.value.connections.forEach(connection => {
+            if (connection.fromId === id || connection.toId === id) {
+                annotator.applyAction(Action.Connection.Delete(connection.id))
+            }
+        })
+        currentTask.connections = annotator.store.json.connections //更新三元组信息
     })
     //关系增加删除
     annotator.on("twoLabelsClicked", (fromId: number, toId: number) => {
@@ -612,9 +495,8 @@ watch([leftOpen, rightOpen], () => {
 //离开页面，更新时间
 onUnmounted(() => {
     const nowDate = new Date()
-    const date = `${nowDate.getFullYear()}-${
-        nowDate.getMonth() + 1
-    }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
+    const date = `${nowDate.getFullYear()}-${nowDate.getMonth() + 1
+        }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
     currentTask.changeDate = date
 })
 </script>
@@ -622,6 +504,7 @@ onUnmounted(() => {
 <style scoped lang="less">
 .text-annotation {
     height: 100vh;
+
     .annotation-header {
         height: 50px;
         display: flex;
@@ -631,6 +514,7 @@ onUnmounted(() => {
         box-sizing: border-box;
         padding: 0 2%;
         background: #fff;
+
         .btn-group {
             display: flex;
             justify-content: space-between;
@@ -638,11 +522,13 @@ onUnmounted(() => {
             width: 18%;
         }
     }
+
     .annotation-content {
         display: flex;
         justify-content: flex-start;
         box-sizing: border-box;
         position: relative;
+
         .left-open,
         .right-open {
             position: absolute;
@@ -661,24 +547,30 @@ onUnmounted(() => {
             svg {
                 color: #898098;
             }
+
             &:hover {
                 background-color: rgba(9, 109, 217, 0.16);
             }
         }
+
         .left-open {
             left: 0;
         }
+
         .right-open {
             right: 0;
         }
+
         .data-label-area {
             box-sizing: border-box;
             height: calc(100vh - 50px);
             overflow: auto;
             width: 200px;
             border-right: 1px solid rgba(0, 0, 0, 0.1);
+
             .data-header {
                 height: 50px;
+
                 .data-desc {
                     display: flex;
                     justify-content: space-between;
@@ -688,16 +580,20 @@ onUnmounted(() => {
                     color: rgba(0, 0, 0, 0.5);
                     font-size: 13px;
                     font-weight: 700;
+
                     .title,
                     .tooltip {
                         flex: none;
                         cursor: pointer;
                     }
+
                     .tooltip {
                         &:hover {
                             background-color: rgba(9, 109, 217, 0.16);
                         }
+
                         position: relative;
+
                         svg {
                             position: relative;
                             top: 2px;
@@ -711,29 +607,35 @@ onUnmounted(() => {
             flex: 1;
             height: calc(100vh - 50px);
             margin: 0 25px;
+
             .tags-box-area {
                 min-height: 100px;
                 max-height: 200px;
                 overflow: auto;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
                 .view-tags {
                     display: flex;
                     flex-wrap: wrap;
                     margin: 15px 0;
+
                     .tag-item {
                         border-radius: 3px;
                         display: flex;
                         margin: 0 8px 8px 0;
                         cursor: pointer;
+
                         &:hover {
                             background: var(--color);
                             border-radius: 4px;
                         }
+
                         .tag-head {
                             width: 3px;
                             background: var(--color);
                             border-radius: 3px 0 0 3px;
                         }
+
                         .tag-content {
                             background: var(--color);
                             padding: 0 5px;
@@ -741,11 +643,13 @@ onUnmounted(() => {
                             display: flex;
                             align-items: center;
                             justify-content: center;
+
                             .tag-text {
                                 flex: 1;
                                 min-width: 60px;
                                 margin-right: 5px;
                             }
+
                             .tag-hotkey {
                                 color: rgba(0, 0, 0, 0.4);
                             }
@@ -753,17 +657,20 @@ onUnmounted(() => {
                     }
                 }
             }
+
             .content-box-area {
                 height: 500px;
                 max-height: 500px;
                 overflow: auto;
                 background-color: #fafafa;
                 margin-top: 20px;
-                & > svg {
+
+                &>svg {
                     width: 100%;
                 }
             }
         }
+
         .data-conncetion-area {
             width: 300px;
             border-left: 1px solid rgba(0, 0, 0, 0.1);
@@ -773,6 +680,7 @@ onUnmounted(() => {
 
             .data-header {
                 height: 50px;
+
                 .data-desc {
                     display: flex;
                     justify-content: space-between;
@@ -782,16 +690,20 @@ onUnmounted(() => {
                     color: rgba(0, 0, 0, 0.5);
                     font-size: 13px;
                     font-weight: 700;
+
                     .title,
                     .tooltip {
                         flex: none;
                         cursor: pointer;
                     }
+
                     .tooltip {
                         &:hover {
                             background-color: rgba(9, 109, 217, 0.16);
                         }
+
                         position: relative;
+
                         svg {
                             position: relative;
                             top: 2px;
@@ -800,6 +712,7 @@ onUnmounted(() => {
                 }
             }
         }
+
         .data-close {
             width: 0;
         }
