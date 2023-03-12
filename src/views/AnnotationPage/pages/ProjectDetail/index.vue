@@ -3,42 +3,25 @@
         <!-- 头部 -->
         <header class="detail-header">
             <el-breadcrumb :separator-icon="ArrowRight">
-                <el-breadcrumb-item :to="{ path: '/annotation' }"
-                    >项目管理</el-breadcrumb-item
-                >
-                <el-breadcrumb-item
-                    :to="{ path: `/projectSetting`, query: { pID } }"
-                    >{{ currentProject.name }}</el-breadcrumb-item
-                >
+                <el-breadcrumb-item :to="{ path: '/annotation' }">项目管理</el-breadcrumb-item>
+                <el-breadcrumb-item :to="{ path: `/projectSetting`, query: { pID } }">{{ currentProject.name
+                }}</el-breadcrumb-item>
                 <el-breadcrumb-item>详情</el-breadcrumb-item>
             </el-breadcrumb>
             <div class="btn-group">
-                <el-button
-                    @click="
-                        router.push({ path: `/projectSetting`, query: { pID } })
-                    "
-                    >项目设置</el-button
-                >
-                <el-button @click="openUploader = true" type="primary"
-                    >数据导入</el-button
-                >
-                <el-button
-                    type="success"
-                    @click="openDownloaderDig(-1)"
-                    :disabled="selectedTaskList.length === 0"
-                    >项目数据导出</el-button
-                >
+                <el-button @click="
+                    router.push({ path: `/projectSetting`, query: { pID } })
+                ">项目设置</el-button>
+                <el-button @click="openUploader = true" type="primary">数据导入</el-button>
+                <el-button type="success" @click="openDownloaderDig(-1)"
+                    :disabled="selectedTaskList.length === 0">项目数据导出</el-button>
+                <el-button type="success" @click="downloadConfig">项目配置导出</el-button>
             </div>
         </header>
         <!-- 中间 -->
         <section class="detail-content">
-            <el-table
-                height="600"
-                style="width: 100%"
-                :data="showData"
-                size="large"
-                @selection-change="handleSelectionChange"
-            >
+            <el-table height="600" style="width: 100%" :data="showData" size="large"
+                @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
                 <el-table-column label="ID" width="200">
                     <template #default="scope">
@@ -55,108 +38,52 @@
                 <el-table-column label="状态" width="200">
                     <template #default="scope">
                         <!-- {{ scope.row.state }} -->
-                        <el-popover
-                            placement="top-start"
-                            :width="200"
-                            :visible="stateRef === Number(scope.$index)"
-                        >
+                        <el-popover placement="top-start" :width="200" :visible="stateRef === Number(scope.$index)">
                             <template #reference>
-                                <el-tag
-                                    @click="
-                                        stateRef === Number(scope.$index)
-                                            ? (stateRef = -1)
-                                            : (stateRef = Number(scope.$index))
-                                    "
-                                    :type="state[scope.row.state].type"
-                                    trigger="click"
-                                    style="cursor: pointer"
-                                >
-                                    {{ state[scope.row.state].info }}</el-tag
-                                >
+                                <el-tag @click="
+                                    stateRef === Number(scope.$index)
+                                        ? (stateRef = -1)
+                                        : (stateRef = Number(scope.$index))
+                                " :type="state[scope.row.state].type" trigger="click" style="cursor: pointer">
+                                    {{ state[scope.row.state].info }}</el-tag>
                             </template>
-                            <div
-                                class="state-select"
-                                :style="`
-                                    display: flex;
-                                    justify-content: space-around;
-                                    align-items: center;
-                                    cursor: pointer
-                                    `"
-                            >
-                                <el-tag
-                                    class="tag"
-                                    @click="setState(scope.$index, 'pending')"
-                                    >进行中</el-tag
-                                >
-                                <el-tag
-                                    class="tag"
-                                    @click="setState(scope.$index, 'resolve')"
-                                    type="success"
-                                    >已完成</el-tag
-                                >
-                                <el-tag
-                                    class="tag"
-                                    @click="setState(scope.$index, 'reject')"
-                                    type="danger"
-                                    >已终止</el-tag
-                                >
+                            <div class="state-select" :style="`
+                                        display: flex;
+                                        justify-content: space-around;
+                                        align-items: center;
+                                        cursor: pointer
+                                        `">
+                                <el-tag class="tag" @click="setState(scope.$index, 'pending')">进行中</el-tag>
+                                <el-tag class="tag" @click="setState(scope.$index, 'resolve')" type="success">已完成</el-tag>
+                                <el-tag class="tag" @click="setState(scope.$index, 'reject')" type="danger">已终止</el-tag>
                             </div>
                         </el-popover>
                     </template>
                 </el-table-column>
                 <el-table-column label="数据" width="400">
                     <template #default="scope">
-                        {{ scope.row.fileContent.slice(0,6)+'...' }}
+                        {{ scope.row.fileContent.slice(0, 6) + '...' }}
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" min-width="100">
                     <template #default="scope">
-                        <el-tooltip
-                            effect="dark"
-                            content="标注"
-                            placement="top"
-                        >
-                            <el-button
-                                type="primary"
-                                :icon="Edit"
-                                @click="toTextAnnotation(Number(scope.$index))"
-                            />
+                        <el-tooltip effect="dark" content="标注" placement="top">
+                            <el-button type="primary" :icon="Edit" @click="toTextAnnotation(Number(scope.$index))" />
                         </el-tooltip>
-                        <el-tooltip
-                            effect="dark"
-                            content="数据导出"
-                            placement="top"
-                        >
-                            <el-button
-                                type="success"
-                                :icon="Upload"
-                                @click="openDownloaderDig(scope.$index)"
-                            />
+                        <el-tooltip effect="dark" content="数据导出" placement="top">
+                            <el-button type="success" :icon="Upload" @click="openDownloaderDig(scope.$index)" />
                         </el-tooltip>
-                        <el-popover
-                            placement="top-start"
-                            title="删除该文件及其标注"
-                            :visible="deleteRef === Number(scope.$index)"
-                        >
+                        <el-popover placement="top-start" title="删除该文件及其标注" :visible="deleteRef === Number(scope.$index)">
                             <template #reference>
-                                <el-button
-                                    type="danger"
-                                    :icon="Delete"
-                                    @click="
-                                        deleteRef === Number(scope.$index)
-                                            ? (deleteRef = -1)
-                                            : (deleteRef = Number(scope.$index))
-                                    "
-                                />
+                                <el-button type="danger" :icon="Delete" @click="
+                                    deleteRef === Number(scope.$index)
+                                        ? (deleteRef = -1)
+                                        : (deleteRef = Number(scope.$index))
+                                " />
                             </template>
                             <!--  -->
                             <div>
-                                <el-button
-                                    plain
-                                    type="danger"
-                                    @click="deleteFile(Number(scope.$index))"
-                                    >确认删除</el-button
-                                >
+                                <el-button plain type="danger" @click="deleteFile(Number(scope.$index))">确认删除</el-button>
                             </div>
                         </el-popover>
                     </template>
@@ -223,13 +150,7 @@
     </main>
     <!-- 数据导入 -->
     <div class="uplaoder">
-        <el-dialog
-            v-model="openUploader"
-            :close-on-click-modal="true"
-            :show-close="false"
-            width="95%"
-            top="40px"
-        >
+        <el-dialog v-model="openUploader" :close-on-click-modal="true" :show-close="false" width="95%" top="40px">
             <template #header="{ close, titleId, titleClass }">
                 <div class="step-warpper">
                     <div class="left-title">数据导入</div>
@@ -246,15 +167,8 @@
                 <!-- 数据导入 -->
                 <div class="project-data">
                     <!-- 拖拽上传 -->
-                    <el-upload
-                        class="upload-box"
-                        drag
-                        :auto-upload="false"
-                        action=""
-                        multiple
-                        :show-file-list="false"
-                        :on-change="loadTextFromFile"
-                    >
+                    <el-upload class="upload-box" drag :auto-upload="false" action="" multiple :show-file-list="false"
+                        :on-change="loadTextFromFile">
                         <el-icon class="el-icon--upload">
                             <upload-filled />
                         </el-icon>
@@ -269,24 +183,12 @@
                     </el-upload>
                     <!-- 已上传文件列表 -->
                     <div class="file-list">
-                        <el-table
-                            :data="uploadFlieList"
-                            style="width: 100%"
-                            height="300"
-                        >
+                        <el-table :data="uploadFlieList" style="width: 100%" height="300">
                             <el-table-column prop="fileName" label="文件名" />
-                            <el-table-column
-                                prop="fileContent"
-                                label="文本内容"
-                                show-overflow-tooltip
-                            />
+                            <el-table-column prop="fileContent" label="文本内容" show-overflow-tooltip />
                             <el-table-column label="操作">
                                 <template #default="scope">
-                                    <el-button
-                                        size="small"
-                                        type="danger"
-                                        @click="handleFileDelete(scope.$index)"
-                                        >删除文件
+                                    <el-button size="small" type="danger" @click="handleFileDelete(scope.$index)">删除文件
                                     </el-button>
                                 </template>
                             </el-table-column>
@@ -298,13 +200,7 @@
     </div>
     <!-- 数据导出 -->
     <div class="data-downloader">
-        <el-dialog
-            v-model="openDownloader"
-            :close-on-click-modal="true"
-            :show-close="false"
-            width="40%"
-            top="40px"
-        >
+        <el-dialog v-model="openDownloader" :close-on-click-modal="true" :show-close="false" width="40%" top="40px">
             <template #header="{ close, titleId, titleClass }">
                 <div class="step-warpper">
                     <div class="left-title">数据导出</div>
@@ -312,23 +208,14 @@
                         <div class="step-item item-active">数据导出</div>
                     </div>
                     <div class="right-button">
-                        <el-button @click="closeDownloader(close)"
-                            >取消</el-button
-                        >
-                        <el-button type="primary" @click="toDownloadTheFile"
-                            >确定</el-button
-                        >
+                        <el-button @click="closeDownloader(close)">取消</el-button>
+                        <el-button type="primary" @click="toDownloadTheFile">确定</el-button>
                     </div>
                 </div>
             </template>
             <div class="content-wapper">
-                <el-form
-                    label-width="120px"
-                    label-position="left"
-                    :model="outputOptions"
-                    class="output-form"
-                    ref="outputForm"
-                >
+                <el-form label-width="120px" label-position="left" :model="outputOptions" class="output-form"
+                    ref="outputForm">
                     <!-- 导出名称 -->
                     <el-form-item label="导出文件名称" class="output-form-item">
                         <el-input v-model="outputOptions.fileName" />
@@ -347,18 +234,9 @@
                             </p>
                         </el-alert>
                         <el-form-item label="导出类型">
-                            <el-select
-                                placeholder="选择导出类型"
-                                v-model="outputOptions.type"
-                            >
-                                <el-option
-                                    label="Labels 数据导出"
-                                    value="label"
-                                />
-                                <el-option
-                                    label="Connections 数据导出"
-                                    value="connection"
-                                />
+                            <el-select placeholder="选择导出类型" v-model="outputOptions.type">
+                                <el-option label="Labels 数据导出" value="label" />
+                                <el-option label="Connections 数据导出" value="connection" />
                                 <el-option label="全文数据导出" value="all" />
                             </el-select>
                         </el-form-item>
@@ -376,9 +254,7 @@
                                 </p>
                             </el-alert>
                             <el-form-item label="标签模式">
-                                <el-radio-group
-                                    v-model="outputOptions.label.isWholeLabel"
-                                >
+                                <el-radio-group v-model="outputOptions.label.isWholeLabel">
                                     <el-radio :label="false">单体标签</el-radio>
                                     <el-radio :label="true">整体标签</el-radio>
                                 </el-radio-group>
@@ -387,27 +263,21 @@
                         <!-- 模式 -->
                         <el-space fill v-if="outputOptions.label.isWholeLabel">
                             <el-alert type="info" show-icon :closable="false">
-                                <p
-                                    v-if="
-                                        outputOptions.label.wholeLabelMode ===
-                                        'BI'
-                                    "
-                                >
+                                <p v-if="
+                                    outputOptions.label.wholeLabelMode ===
+                                    'BI'
+                                ">
                                     将对标注实体拆分并自动生成前缀:B-、I-、
                                 </p>
-                                <p
-                                    v-if="
-                                        outputOptions.label.wholeLabelMode ===
-                                        'BIE'
-                                    "
-                                >
+                                <p v-if="
+                                    outputOptions.label.wholeLabelMode ===
+                                    'BIE'
+                                ">
                                     将对标注实体拆分并自动生成前缀:B-、I-、E-、
                                 </p>
                             </el-alert>
                             <el-form-item label="前缀模式">
-                                <el-radio-group
-                                    v-model="outputOptions.label.wholeLabelMode"
-                                >
+                                <el-radio-group v-model="outputOptions.label.wholeLabelMode">
                                     <el-radio :label="'BI'">BI</el-radio>
                                     <el-radio :label="'BIE'">BIE</el-radio>
                                 </el-radio-group>
@@ -428,9 +298,7 @@
                                 </p>
                             </el-alert>
                             <el-form-item label="导出格式">
-                                <el-input
-                                    v-model="outputOptions.label.format"
-                                />
+                                <el-input v-model="outputOptions.label.format" />
                             </el-form-item>
                         </el-space>
                     </div>
@@ -461,9 +329,7 @@
                                 </p>
                             </el-alert>
                             <el-form-item label="导出格式">
-                                <el-input
-                                    v-model="outputOptions.connection.format"
-                                />
+                                <el-input v-model="outputOptions.connection.format" />
                             </el-form-item>
                         </el-space>
                     </div>
@@ -480,10 +346,7 @@
                                 </p>
                             </el-alert>
                             <el-form-item label="标签模式">
-                                <el-radio-group
-                                    v-model="outputOptions.all.isWholeLabel"
-                                    class=""
-                                >
+                                <el-radio-group v-model="outputOptions.all.isWholeLabel" class="">
                                     <el-radio :label="false">单体标签</el-radio>
                                     <el-radio :label="true">整体标签</el-radio>
                                 </el-radio-group>
@@ -492,27 +355,21 @@
                         <!-- 模式 -->
                         <el-space fill v-if="outputOptions.all.isWholeLabel">
                             <el-alert type="info" show-icon :closable="false">
-                                <p
-                                    v-if="
-                                        outputOptions.all.wholeLabelMode ===
-                                        'BI'
-                                    "
-                                >
+                                <p v-if="
+                                    outputOptions.all.wholeLabelMode ===
+                                    'BI'
+                                ">
                                     将对标注实体拆分并自动生成前缀:B-、I-、
                                 </p>
-                                <p
-                                    v-if="
-                                        outputOptions.all.wholeLabelMode ===
-                                        'BIE'
-                                    "
-                                >
+                                <p v-if="
+                                    outputOptions.all.wholeLabelMode ===
+                                    'BIE'
+                                ">
                                     将对标注实体拆分并自动生成前缀:B-、I-、E-、
                                 </p>
                             </el-alert>
                             <el-form-item label="前缀模式">
-                                <el-radio-group
-                                    v-model="outputOptions.all.wholeLabelMode"
-                                >
+                                <el-radio-group v-model="outputOptions.all.wholeLabelMode">
                                     <el-radio :label="'BI'">BI</el-radio>
                                     <el-radio :label="'BIE'">BIE</el-radio>
                                 </el-radio-group>
@@ -543,16 +400,9 @@
                                 </p>
                             </el-alert>
                             <el-form-item label="自动标注">
-                                <el-select
-                                    placeholder="选择自动标注"
-                                    v-model="outputOptions.all.autoFill"
-                                    value-key="id"
-                                >
-                                    <el-option
-                                        v-for="item in currentProject.labelCategories"
-                                        :label="item.text"
-                                        :value="item"
-                                    />
+                                <el-select placeholder="选择自动标注" v-model="outputOptions.all.autoFill" value-key="id">
+                                    <el-option v-for="item in currentProject.labelCategories" :label="item.text"
+                                        :value="item" />
                                 </el-select>
                             </el-form-item>
                         </el-space>
@@ -621,9 +471,8 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
     setImmediate(() => {
         useFileReader(file, (r: string) => {
             const nowDate = new Date()
-            const date = `${nowDate.getFullYear()}-${
-                nowDate.getMonth() + 1
-            }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
+            const date = `${nowDate.getFullYear()}-${nowDate.getMonth() + 1
+                }-${nowDate.getDate()} ${nowDate.getHours()}:${nowDate.getMinutes()}`
             //增加切片
             const fiberSize: number = 10000
             const fiber = Math.floor(r.length / fiberSize)
@@ -697,6 +546,24 @@ const loadTextFromFile = (uploadFile: UploadFile) => {
 }
 const handleFileDelete = (index: number) => {
     uploadFlieList.value.splice(index, 1)
+}
+//导出配置文件
+const downloadConfig = () => {
+    const file = new File([JSON.stringify([currentProject])], `${currentProject.name}-config.txt`, {
+        type: "text/plain",
+    });
+    const downloadElement = document.createElement("a")
+    // 创建下载链接
+    const href = window.URL.createObjectURL(file)
+    downloadElement.href = href
+    // 下载文件名
+    downloadElement.download = `${currentProject.name}-config.txt`
+    document.body.appendChild(downloadElement)
+    downloadElement.click()
+    // 移除元素
+    document.body.removeChild(downloadElement)
+    // 释放blob对象
+    window.URL.revokeObjectURL(href)
 }
 //列表展示属性
 const showData = computed(() => {
@@ -882,6 +749,7 @@ const getComputedConnectionCount = (tID: number) => {
 <style scoped lang="less">
 .project-detail {
     height: 100vh;
+
     .detail-header {
         height: 50px;
         display: flex;
@@ -892,25 +760,30 @@ const getComputedConnectionCount = (tID: number) => {
         padding: 0 2%;
         background: #fff;
     }
+
     .detail-content {
         max-height: calc(100vh - 100px);
         overflow: hidden;
         padding: 20px;
+
         :deep(.el-table__expanded-cell) {
             background: #fafafa;
             padding: 0;
         }
+
         .task-detail {
             height: 300px;
             box-sizing: border-box;
             display: flex;
             justify-content: space-between;
+
             .task-data {
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
                 width: 30%;
                 padding-top: 30px;
+
                 .task-data-item {
                     padding: 0 100px;
                     margin: 20px 0 0 0;
@@ -918,6 +791,7 @@ const getComputedConnectionCount = (tID: number) => {
                     font-weight: 500;
                 }
             }
+
             .task-label-chart,
             .task-connection-cahrt {
                 box-sizing: border-box;
@@ -928,20 +802,24 @@ const getComputedConnectionCount = (tID: number) => {
         }
     }
 }
+
 .uplaoder {
     ::v-deep .el-dialog {
         margin-bottom: 0;
         border-radius: 10px;
+
         .el-dialog__header {
             padding: 0;
             margin-right: 0;
         }
+
         .el-dialog__body {
             padding-top: 0;
             padding-bottom: 0;
             // height: 100%;
         }
     }
+
     .step-warpper {
         display: flex;
         justify-content: space-between;
@@ -952,6 +830,7 @@ const getComputedConnectionCount = (tID: number) => {
         min-height: 40px;
         padding: 16px 40px;
         cursor: pointer;
+
         .left-title {
             font-size: 20px;
             margin-bottom: 0;
@@ -959,6 +838,7 @@ const getComputedConnectionCount = (tID: number) => {
             margin-top: 0;
             width: 20%;
         }
+
         .step-content {
             width: 40%;
             height: 34px;
@@ -969,6 +849,7 @@ const getComputedConnectionCount = (tID: number) => {
             display: flex;
             align-items: center;
             justify-content: space-around;
+
             .step-item {
                 text-align: center;
                 margin: 0 5px;
@@ -977,6 +858,7 @@ const getComputedConnectionCount = (tID: number) => {
                 color: rgba(0, 0, 0, 0.6);
                 max-width: 50%;
             }
+
             .item-active {
                 background: #fff;
                 box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 2%),
@@ -984,12 +866,14 @@ const getComputedConnectionCount = (tID: number) => {
                 color: #000;
             }
         }
+
         .right-button {
             width: 20%;
             display: flex;
             justify-content: flex-end;
         }
     }
+
     .content-wapper {
         position: relative;
         display: flex;
@@ -999,28 +883,34 @@ const getComputedConnectionCount = (tID: number) => {
         box-sizing: border-box;
         height: 80vh;
         overflow: auto;
+
         .project-data {
             width: 60%;
             margin-top: 50px;
+
             .upload-box {
                 width: 100%;
             }
         }
     }
 }
+
 .data-downloader {
     ::v-deep .el-dialog {
         margin-bottom: 0;
         border-radius: 10px;
+
         .el-dialog__header {
             padding: 0;
             margin-right: 0;
         }
+
         .el-dialog__body {
             padding-top: 0;
             padding-bottom: 0;
         }
     }
+
     .step-warpper {
         display: flex;
         align-items: center;
@@ -1030,6 +920,7 @@ const getComputedConnectionCount = (tID: number) => {
         min-height: 40px;
         padding: 16px 40px;
         cursor: pointer;
+
         .left-title {
             font-size: 20px;
             margin-bottom: 0;
@@ -1037,6 +928,7 @@ const getComputedConnectionCount = (tID: number) => {
             margin-top: 0;
             width: 20%;
         }
+
         .step-content {
             width: 40%;
             height: 34px;
@@ -1047,6 +939,7 @@ const getComputedConnectionCount = (tID: number) => {
             display: flex;
             align-items: center;
             justify-content: space-around;
+
             .step-item {
                 text-align: center;
                 margin: 0 5px;
@@ -1055,6 +948,7 @@ const getComputedConnectionCount = (tID: number) => {
                 color: rgba(0, 0, 0, 0.6);
                 max-width: 50%;
             }
+
             .item-active {
                 background: #fff;
                 box-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 0 0 1px rgb(0 0 0 / 2%),
@@ -1062,12 +956,14 @@ const getComputedConnectionCount = (tID: number) => {
                 color: #000;
             }
         }
+
         .right-button {
             width: 20%;
             display: flex;
             justify-content: flex-end;
         }
     }
+
     .content-wapper {
         position: relative;
         display: flex;
