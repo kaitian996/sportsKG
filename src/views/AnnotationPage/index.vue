@@ -6,40 +6,32 @@
             <div class="left">
                 <div class="title">项目</div>
             </div>
+            <input type="file" @change="loadTextFromFile" accept=".txt, .json, .traintest" style="display: none"
+                ref="uploadRef">
             <!-- 右侧 -->
             <div class="right">
-                <el-button type="primary" @click="createAnnotationProject"
-                    >创建项目</el-button
-                >
+                <el-button type="success" @click="loadConfig">导入配制</el-button>
+                <el-button type="primary" @click="createAnnotationProject">创建项目</el-button>
             </div>
         </div>
         <!-- 项目主体 -->
         <div class="project-content">
             <!-- 项目主体卡片 -->
-            <div
-                class="project-item"
-                @click="toDetail(index)"
-                v-for="(item, index) in projectStore.annotationProject"
-            >
+            <div class="project-item" @click="toDetail(index)" v-for="(item, index) in projectStore.annotationProject">
                 <!-- 上部 -->
                 <div class="top-content">
                     <div class="item-title">
                         <div class="item-name">
                             {{ item.name }}
                         </div>
-                        <div
-                            class="item-btn"
-                            :class="
-                                openMenuIndex === index ? 'item-btn-active' : ''
-                            "
-                            @click.stop="openMenu(index)"
-                        >
-                            <el-icon size="20px"><MoreFilled /></el-icon>
+                        <div class="item-btn" :class="
+                            openMenuIndex === index ? 'item-btn-active' : ''
+                        " @click.stop="openMenu(index)">
+                            <el-icon size="20px">
+                                <MoreFilled />
+                            </el-icon>
                         </div>
-                        <div
-                            class="btn-container"
-                            v-if="openMenuIndex === index"
-                        >
+                        <div class="btn-container" v-if="openMenuIndex === index">
                             <div class="btn" @click.stop="toSetting(index)">
                                 项目设置
                             </div>
@@ -57,21 +49,10 @@
                         </div>
                         <div class="info-detail">
                             <div class="detail-item">
-                                <svg
-                                    width="12"
-                                    height="9"
-                                    viewBox="0 0 12 9"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    tag="[object Object]"
-                                    color="#64bf00"
-                                >
-                                    <path
-                                        d="M2 4l3 3 5-5"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="square"
-                                    ></path>
+                                <svg width="12" height="9" viewBox="0 0 12 9" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                    tag="[object Object]" color="#64bf00">
+                                    <path d="M2 4l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                                    </path>
                                 </svg>
                                 {{
                                     item.data.filter(
@@ -80,22 +61,10 @@
                                 }}
                             </div>
                             <div class="detail-item">
-                                <svg
-                                    width="10"
-                                    height="2"
-                                    viewBox="0 0 10 2"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    tag="[object Object]"
-                                    color="red"
-                                >
-                                    <path
-                                        opacity="0.9"
-                                        d="M1 1h8"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="square"
-                                    ></path>
+                                <svg width="10" height="2" viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                    tag="[object Object]" color="red">
+                                    <path opacity="0.9" d="M1 1h8" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="square"></path>
                                 </svg>
                                 {{
                                     item.data.filter(
@@ -104,22 +73,10 @@
                                 }}
                             </div>
                             <div class="detail-item">
-                                <svg
-                                    width="10"
-                                    height="12"
-                                    viewBox="0 0 10 12"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    tag="[object Object]"
-                                    color="#07f"
-                                >
-                                    <path
-                                        opacity="0.9"
-                                        d="M4 11h2M3 8c0-2-1.5-2.5-1.5-4s1-3 3.5-3 3.5 1.5 3.5 3S7 6 7 8"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="square"
-                                    ></path>
+                                <svg width="10" height="12" viewBox="0 0 10 12" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" tag="[object Object]" color="#07f">
+                                    <path opacity="0.9" d="M4 11h2M3 8c0-2-1.5-2.5-1.5-4s1-3 3.5-3 3.5 1.5 3.5 3S7 6 7 8"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="square"></path>
                                 </svg>
                                 {{
                                     item.data.filter(
@@ -141,10 +98,7 @@
                 </div>
             </div>
         </div>
-        <el-empty
-            description="暂无项目,请点击右上角创建项目"
-            v-if="projectStore.annotationProject.length === 0"
-        />
+        <el-empty description="暂无项目,请点击右上角创建项目" v-if="projectStore.annotationProject.length === 0" />
         <!-- 创建项目的遮罩层 -->
         <CreateProject></CreateProject>
     </main>
@@ -157,11 +111,23 @@ import { ref, reactive, provide } from "vue"
 import { annotationProjectStore } from "@/store/annotationProject"
 import { useRouter } from "vue-router"
 import { ElNotification } from "element-plus"
+import { useFileReader } from "@/hooks/useFileReader"
 const projectStore = annotationProjectStore()
 const openDialog = ref<boolean>(false)
 provide("openDialog", openDialog)
 const createAnnotationProject = () => {
     openDialog.value = true
+}
+const uploadRef = ref<HTMLElement>()
+const loadConfig = () => {
+    uploadRef.value?.click()
+}
+const loadTextFromFile = (e: any) => { //读取文件内容
+    const file = e.target?.files[0];
+    if (!file) return;
+    useFileReader(file, (r: string) => {
+        projectStore.annotationProject.push(...eval(r))
+    })
 }
 //打开项目菜单
 const openMenuIndex = ref<number>(-1)
@@ -205,6 +171,7 @@ const toSetting = (index: number) => {
     box-sizing: border-box;
     padding: 0 2%;
     background: #fff;
+
     .left {
         .title {
             font-size: 18px;
@@ -221,6 +188,7 @@ const toSetting = (index: number) => {
     margin: 0 auto;
     max-height: calc(100% - 50px);
     overflow: auto;
+
     .project-item {
         margin: 1% 1%;
         height: 150px;
@@ -244,6 +212,7 @@ const toSetting = (index: number) => {
                 justify-content: space-between;
                 position: relative;
                 margin-bottom: 5px;
+
                 .item-name {
                     width: 80%;
                     overflow: hidden;
@@ -264,17 +233,20 @@ const toSetting = (index: number) => {
                     // vertical-align: middle;
                     position: relative;
                     opacity: 0.5;
+
                     &:hover {
                         box-shadow: 0 2px 4px rgb(0 0 0 / 5%),
                             inset 0 -1px 0 rgb(0 0 0 / 10%),
                             inset 0 0 0 1px rgb(0 0 0 / 20%);
                     }
+
                     i {
                         vertical-align: middle;
                         position: relative;
                         top: -2px;
                     }
                 }
+
                 .item-btn-active {
                     box-shadow: 0 2px 4px rgb(0 0 0 / 5%),
                         inset 0 -1px 0 rgb(0 0 0 / 10%),
@@ -292,6 +264,7 @@ const toSetting = (index: number) => {
                     box-shadow: 0 5px 20px rgb(0 0 0 / 20%);
                     font-family: Roboto;
                     border-radius: 4px;
+
                     .btn {
                         height: 48px;
                         line-height: 48px;
@@ -300,6 +273,7 @@ const toSetting = (index: number) => {
                         text-align: center;
                         box-sizing: border-box;
                         color: rgba(0, 0, 0, 0.6);
+
                         &:hover {
                             background: #dcdfe6;
                             color: rgba(0, 0, 0, 0.9);
@@ -307,21 +281,26 @@ const toSetting = (index: number) => {
                     }
                 }
             }
+
             .item-info {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+
                 .info-task {
                     opacity: 0.6;
                 }
+
                 .info-detail {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+
                     .detail-item:not(:last-child) {
                         margin-right: 16px;
                         display: flex;
                         align-items: center;
+
                         svg {
                             margin-right: 10px;
                             flex: none;
