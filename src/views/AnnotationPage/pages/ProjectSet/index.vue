@@ -859,7 +859,7 @@ const addNewConnection = () => {
         const max =
             [...currentProject.connectionCategories].sort(
                 (a, b) => b.id! - a.id!
-            )[0].id || -1
+            )[0]?.id || -1
         currentProject.connectionCategories.push({
             id: max + 1,
             text: newConnection.value,
