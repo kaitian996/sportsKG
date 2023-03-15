@@ -36,6 +36,10 @@ const routes: Array<RouteRecordRaw> = [
         path: "/refresh",
         component: () => import("../components/Refresh/index.vue"),
     },
+    {
+        path:"/chat",
+        component:()=>import("../views/ChatPage/index.vue")
+    }
 ]
 
 const router = createRouter({

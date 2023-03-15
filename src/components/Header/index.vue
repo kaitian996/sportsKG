@@ -17,6 +17,9 @@
           <li :class="currentPath === '/search' ? 'isCurrent' : ''" @click="navigate.push('/search')">
             <span>数据知识图谱</span>
           </li>
+          <li :class="currentPath === '/chat' ? 'isCurrent' : ''" @click="navigate.push('/chat')">
+            <span>聊天机器人</span>
+          </li>
           <li :class="currentPath === '/annotation' ? 'isCurrent' : ''" @click="navigate.push('/annotation')">
             <span>数据标注</span>
           </li>
