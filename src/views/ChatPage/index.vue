@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="chat-item 'chat-ai'" v-if="currentTheme === -1">
+                    <div class="chat-item chat-ai" v-if="currentTheme === -1">
                         <div class="chat-item-content">
                             <!-- 左侧头像 -->
                             <div class="left-img">
@@ -69,15 +69,15 @@
                             </div>
                             <!-- 右侧文字 -->
                             <div class="right-content">
-                                我是ai
+                                本聊天机器人由 OpenAI API (gpt-3.5-turbo)提供服务支持，您可以向ChatGpt提供问题并等待回答
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- 输入框 -->
                 <div class="chat-input">
-                    <el-input resize="none" v-model="chatInput" :rows="1" type="textarea" placeholder="Please input" />
-                    <el-button @click="sendMessage" :icon="Promotion" />
+                    <el-input resize="none" v-model="chatInput" :rows="1" type="textarea" placeholder="输入信息" />
+                    <el-button @click="sendMessage" :icon="Promotion" :loading="loadingMessage" />
                 </div>
             </div>
         </section>
@@ -94,12 +94,17 @@ import Header from '@/components/Header/index.vue'
 import Footer from '@/components/Footer/index.vue'
 import axios from "axios"
 import { ChatList } from './type'
-
+import { chatGptStore } from "@/store/chatGpt"
+import { storeToRefs } from "pinia"
 // 左侧对话列表
-const chatList = ref<ChatList[]>([])
+const chatStore = chatGptStore()
+const { chatList } = storeToRefs(chatStore)
 const currentTheme = ref<number>(-1)
 const chatInput = ref<string>("")
+const loadingMessage = ref<boolean>(false)
 const sendMessage = async () => {
+    if (chatInput.value === "") return
+    loadingMessage.value = true
     if (currentTheme.value === -1) { //说明是新建主题
         const newTheme: ChatList = {
             theme: chatInput.value.slice(0, 5),
@@ -120,20 +125,30 @@ const sendMessage = async () => {
     }
     chatInput.value = "" //置空对话框
     try {
-        const res = await axios.post("http://www.aitoolgpt.com/api", {
+        const res = await axios.post("http://sportskg.top:3000/api/chat/sendMessage", {
             messages: chatList.value[currentTheme.value].messages,
-            key: "",
-            temperature: 1,
         })
         if (res.data) {
-            chatList.value[currentTheme.value].messages.push({
-                role: "assistant",
-                content: res.data
-            })
+            schedulerCallBack(res.data)
         }
     } catch (error) {
 
     }
+}
+const schedulerCallBack = (messages: string) => {
+    const messagesTarget = chatList.value[currentTheme.value].messages
+    messagesTarget.push({
+        role: "assistant",
+        content: messages.slice(0, 1)
+    })
+    const timer = setInterval(() => {
+        if (messagesTarget[messagesTarget.length - 1].content.length < messages.length) {
+            messagesTarget[messagesTarget.length - 1].content = messages.slice(0, messagesTarget[messagesTarget.length - 1].content.length + 1)
+        } else {
+            clearInterval(timer)
+            loadingMessage.value = false
+        }
+    }, 150)
 }
 </script>
  
