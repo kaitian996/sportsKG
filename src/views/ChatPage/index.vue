@@ -185,6 +185,10 @@ const schedulerCallBack = (messages: string) => {
                 border: 1px solid #d9d9e3;
                 border-radius: 4px;
                 cursor: pointer;
+
+                &:hover {
+                    background-color: #d9d9e3;
+                }
             }
 
             .chat-history {
@@ -246,7 +250,6 @@ const schedulerCallBack = (messages: string) => {
                             border-radius: .125rem;
                         }
 
-                        .right-content {}
                     }
                 }
 
@@ -268,5 +271,4 @@ const schedulerCallBack = (messages: string) => {
             }
         }
     }
-}
-</style>
+}</style>
